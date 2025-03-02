@@ -1,0 +1,81 @@
+<view class="container">
+  <view class="header">
+    <text class="title">隐私设置</text>
+    <text class="subtitle">管理您的数据访问权限和个人数据</text>
+  </view>
+
+  <!-- 隐私选项 -->
+  <view class="privacy-section">
+    <view class="section-title">数据共享</view>
+    <view class="privacy-item">
+      <view class="item-content">
+        <text class="item-title">健康数据共享</text>
+        <text class="item-desc">允许小艺医疗使用您的健康数据进行健康分析和服务优化</text>
+      </view>
+      <switch checked="{{privacySettings.shareHealthData}}" bindchange="onSwitchChange" data-field="shareHealthData" color="#3f51b5" />
+    </view>
+    
+    <view class="privacy-item">
+      <view class="item-content">
+        <text class="item-title">健康档案共享给医生</text>
+        <text class="item-desc">允许授权的医生查看您的健康档案</text>
+      </view>
+      <switch checked="{{privacySettings.shareToDoctors}}" bindchange="onSwitchChange" data-field="shareToDoctors" color="#3f51b5" />
+    </view>
+    
+    <view class="privacy-item">
+      <view class="item-content">
+        <text class="item-title">匿名数据用于研究</text>
+        <text class="item-desc">允许小艺医疗将您的匿名数据用于医疗研究</text>
+      </view>
+      <switch checked="{{privacySettings.anonymousDataForResearch}}" bindchange="onSwitchChange" data-field="anonymousDataForResearch" color="#3f51b5" />
+    </view>
+  </view>
+
+  <!-- 账号安全 -->
+  <view class="privacy-section">
+    <view class="section-title">账号安全</view>
+    <view class="privacy-item">
+      <view class="item-content">
+        <text class="item-title">登录提醒</text>
+        <text class="item-desc">在新设备上登录时发送提醒</text>
+      </view>
+      <switch checked="{{privacySettings.loginAlert}}" bindchange="onSwitchChange" data-field="loginAlert" color="#3f51b5" />
+    </view>
+    
+    <view class="privacy-item">
+      <view class="item-content">
+        <text class="item-title">生物识别解锁</text>
+        <text class="item-desc">使用指纹或面部识别解锁小程序</text>
+      </view>
+      <switch checked="{{privacySettings.biometricUnlock}}" bindchange="onSwitchChange" data-field="biometricUnlock" color="#3f51b5" />
+    </view>
+    
+    <view class="action-item" bindtap="changePassword">
+      <text class="action-text">修改密码</text>
+      <view class="arrow"></view>
+    </view>
+  </view>
+
+  <!-- 数据管理 -->
+  <view class="privacy-section">
+    <view class="section-title">数据管理</view>
+    <view class="action-item" bindtap="exportData">
+      <text class="action-text">导出我的数据</text>
+      <view class="arrow"></view>
+    </view>
+    
+    <view class="action-item" bindtap="clearCache">
+      <text class="action-text">清除缓存</text>
+      <view class="arrow"></view>
+    </view>
+    
+    <view class="action-item danger" bindtap="showDeleteAccountConfirm">
+      <text class="action-text danger-text">删除账号</text>
+      <view class="arrow"></view>
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-button" bindtap="savePrivacySettings">保存设置</view>
+</view>

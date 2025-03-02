@@ -1,0 +1,108 @@
+<view class="container">
+  <view class="header">
+    <text class="title">通知设置</text>
+    <text class="subtitle">管理您接收的通知类型和方式</text>
+  </view>
+
+  <!-- 通知开关 -->
+  <view class="notification-section">
+    <view class="section-title">通知类型</view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">健康提醒</text>
+        <text class="item-desc">接收测量、用药等健康提醒通知</text>
+      </view>
+      <switch checked="{{notificationSettings.healthReminders}}" bindchange="onSwitchChange" data-field="healthReminders" color="#3f51b5" />
+    </view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">异常数据提醒</text>
+        <text class="item-desc">当健康数据出现异常时接收提醒</text>
+      </view>
+      <switch checked="{{notificationSettings.abnormalDataAlerts}}" bindchange="onSwitchChange" data-field="abnormalDataAlerts" color="#3f51b5" />
+    </view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">健康报告</text>
+        <text class="item-desc">接收每周/每月健康报告</text>
+      </view>
+      <switch checked="{{notificationSettings.healthReports}}" bindchange="onSwitchChange" data-field="healthReports" color="#3f51b5" />
+    </view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">活动与资讯</text>
+        <text class="item-desc">接收健康活动和资讯推送</text>
+      </view>
+      <switch checked="{{notificationSettings.newsAndActivities}}" bindchange="onSwitchChange" data-field="newsAndActivities" color="#3f51b5" />
+    </view>
+  </view>
+
+  <!-- 通知方式 -->
+  <view class="notification-section">
+    <view class="section-title">通知方式</view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">小程序通知</text>
+        <text class="item-desc">在小程序内接收通知</text>
+      </view>
+      <switch checked="{{notificationSettings.inAppNotifications}}" bindchange="onSwitchChange" data-field="inAppNotifications" color="#3f51b5" />
+    </view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">微信服务通知</text>
+        <text class="item-desc">通过微信服务通知接收重要提醒</text>
+      </view>
+      <switch checked="{{notificationSettings.wechatServiceNotifications}}" bindchange="onSwitchChange" data-field="wechatServiceNotifications" color="#3f51b5" />
+    </view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">短信通知</text>
+        <text class="item-desc">通过短信接收重要提醒</text>
+      </view>
+      <switch checked="{{notificationSettings.smsNotifications}}" bindchange="onSwitchChange" data-field="smsNotifications" color="#3f51b5" />
+    </view>
+  </view>
+
+  <!-- 免打扰时间 -->
+  <view class="notification-section">
+    <view class="section-title">免打扰时间</view>
+    
+    <view class="notification-item">
+      <view class="item-content">
+        <text class="item-title">开启免打扰</text>
+        <text class="item-desc">在设定的时间段内不接收通知</text>
+      </view>
+      <switch checked="{{notificationSettings.doNotDisturb}}" bindchange="onSwitchChange" data-field="doNotDisturb" color="#3f51b5" />
+    </view>
+    
+    <view class="time-picker-item" wx:if="{{notificationSettings.doNotDisturb}}">
+      <text class="time-label">开始时间</text>
+      <picker mode="time" value="{{notificationSettings.doNotDisturbStart}}" bindchange="onTimeChange" data-field="doNotDisturbStart">
+        <view class="picker">
+          <text>{{notificationSettings.doNotDisturbStart}}</text>
+          <view class="arrow"></view>
+        </view>
+      </picker>
+    </view>
+    
+    <view class="time-picker-item" wx:if="{{notificationSettings.doNotDisturb}}">
+      <text class="time-label">结束时间</text>
+      <picker mode="time" value="{{notificationSettings.doNotDisturbEnd}}" bindchange="onTimeChange" data-field="doNotDisturbEnd">
+        <view class="picker">
+          <text>{{notificationSettings.doNotDisturbEnd}}</text>
+          <view class="arrow"></view>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-button" bindtap="saveNotificationSettings">保存设置</view>
+</view>

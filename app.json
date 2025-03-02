@@ -1,0 +1,65 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/auth/auth",
+    "pages/health-records/list",
+    "pages/health-records/add",
+    "pages/health-records/edit",
+    "pages/health-records/detail",
+    "pages/health-statistics/index",
+    "pages/health-reminders/index",
+    "pages/health-reminders/add",
+    "pages/health-reminders/edit",
+    "pages/user/profile",
+    "pages/settings/personal/personal",
+    "pages/settings/privacy/privacy",
+    "pages/settings/notification/notification",
+    "pages/settings/terms/terms"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#4785ff",
+    "navigationBarTitleText": "小艺医疗",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4785ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home_selected.png"
+      },
+      {
+        "pagePath": "pages/health-records/list",
+        "text": "健康记录",
+        "iconPath": "images/health.png",
+        "selectedIconPath": "images/health_selected.png"
+      },
+      {
+        "pagePath": "pages/health-statistics/index",
+        "text": "健康统计",
+        "iconPath": "images/chart.png",
+        "selectedIconPath": "images/chart_selected.png"
+      },
+      {
+        "pagePath": "pages/user/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile_selected.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于提供更精准的健康服务"
+    }
+  },
+  "usingComponents": {},
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+} 

@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="logo-container">
+    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <view class="app-name">小艺医疗</view>
+    <view class="app-slogan">您的个人健康管理助手</view>
+  </view>
+  
+  <view class="auth-container">
+    <view class="card">
+      <view class="title">微信登录</view>
+      <view class="auth-description">使用微信账号登录，轻松管理您的健康数据</view>
+      
+      <button class="btn btn-primary login-btn" bindtap="handleLogin">
+        <image class="wechat-icon" src="/images/wechat.png" mode="aspectFit"></image>
+        微信一键登录
+      </button>
+      
+      <view class="privacy-policy">
+        登录即表示您同意
+        <text class="link" bindtap="showPrivacyPolicy">《用户协议与隐私政策》</text>
+      </view>
+    </view>
+    
+    <view class="app-features">
+      <view class="feature-item">
+        <image class="feature-icon" src="/images/feature-record.png" mode="aspectFit"></image>
+        <text class="feature-text">健康数据记录</text>
+      </view>
+      <view class="feature-item">
+        <image class="feature-icon" src="/images/feature-analysis.png" mode="aspectFit"></image>
+        <text class="feature-text">趋势分析</text>
+      </view>
+      <view class="feature-item">
+        <image class="feature-icon" src="/images/feature-reminder.png" mode="aspectFit"></image>
+        <text class="feature-text">健康提醒</text>
+      </view>
+    </view>
+  </view>
+</view> 

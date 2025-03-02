@@ -1,0 +1,110 @@
+.container {
+  padding: 40rpx;
+  box-sizing: border-box;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7f9fc;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx;
+}
+
+.logo {
+  width: 180rpx;
+  height: 180rpx;
+  margin-bottom: 20rpx;
+}
+
+.app-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 10rpx;
+}
+
+.app-slogan {
+  font-size: 28rpx;
+  color: var(--light-text-color);
+}
+
+.auth-container {
+  width: 100%;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 40rpx;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+
+.auth-description {
+  font-size: 28rpx;
+  color: var(--light-text-color);
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  margin-bottom: 30rpx;
+}
+
+.wechat-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+}
+
+.privacy-policy {
+  font-size: 24rpx;
+  color: var(--light-text-color);
+  text-align: center;
+}
+
+.link {
+  color: var(--primary-color);
+}
+
+.app-features {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 60rpx;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feature-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.feature-text {
+  font-size: 24rpx;
+  color: var(--light-text-color);
+} 

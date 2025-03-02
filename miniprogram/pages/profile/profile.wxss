@@ -1,0 +1,180 @@
+.container {
+  min-height: 100vh;
+  background-color: #f7f9fc;
+  padding-bottom: 40rpx;
+}
+
+/* 用户信息卡片 */
+.user-card {
+  background-color: #3f51b5;
+  padding: 40rpx 30rpx;
+  display: flex;
+  align-items: center;
+}
+
+.avatar-container {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  margin-right: 30rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  background-color: #fff;
+  border: 4rpx solid #fff;
+}
+
+.avatar-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-placeholder text {
+  color: #fff;
+  font-size: 20rpx;
+  text-align: center;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: 500;
+  margin-bottom: 10rpx;
+}
+
+.user-id {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24rpx;
+}
+
+/* 选项区域 */
+.section {
+  background-color: #fff;
+  margin: 20rpx 0;
+}
+
+.section-header {
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.section-content {
+  padding: 0 30rpx;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.profile-item:last-child {
+  border-bottom: none;
+}
+
+.item-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.health-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTEyIDIxLjM1bC0xLjQ1LTEuMzJDNS40IDE1LjM2IDIgMTIuMjggMiA4LjUgMiA1LjQyIDQuNDIgMyA3LjUgM2MxLjc0IDAgMy40MS44MSA0LjUgMi4wOUMxMy4wOSAzLjgxIDE0Ljc2IDMgMTYuNSAzIDE5LjU4IDMgMjIgNS40MiAyMiA4LjVjMCAzLjc4LTMuNCA2Ljg2LTguNTUgMTEuNTRMMTIgMjEuMzV6Ii8+PC9zdmc+');
+}
+
+.stats-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTE5IDNoLTRhMSAxIDAgMDAtMSAxdjE2YTEgMSAwIDAwMSAxaDRhMSAxIDAgMDAxLTFWNGExIDEgMCAwMC0xLTF6bS02IDBIOWExIDEgMCAwMC0xIDF2MTZhMSAxIDAgMDAxIDFoNGExIDEgMCAwMDEtMVY0YTEgMSAwIDAwLTEtMXptLTYgOEgzYTEgMSAwIDAwLTEgMXY4YTEgMSAwIDAwMSAxaDRhMSAxIDAgMDAxLTF2LThhMSAxIDAgMDAtMS0xeiIvPjwvc3ZnPg==');
+}
+
+.reminder-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTEyIDIyYzEuMSAwIDItLjkgMi0yaC00YzAgMS4xLjkgMiAyIDJ6bTYtNnYtNWMwLTMuMDctMS42My01LjY0LTQuNS02LjMyVjRjMC0uODMtLjY3LTEuNS0xLjUtMS41cy0xLjUuNjctMS41IDEuNXYuNjhDNy42NCA1LjM2IDYgNy45MiA2IDExdjVsLTIgMnYxaDE2di0xbC0yLTJ6bS0yIDF6Ii8+PC9zdmc+');
+}
+
+.personal-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHY2aDE2di02YzAtMi42Ni01LjMzLTQtOC00eiIvPjwvc3ZnPg==');
+}
+
+.privacy-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTE4IDhoLTFWNmMwLTIuNzYtMi4yNC01LTUtNVM3IDMuMjQgNyA2djJINmMtMS4xIDAtMiAuOS0yIDJ2MTBjMCAxLjEuOSAyIDIgMmgxMmMxLjEgMCAyLS45IDItMlYxMGMwLTEuMS0uOS0yLTItMnptLTYgOWMtMS4xIDAtMi0uOS0yLTJzLjktMiAyLTIgMiAuOSAyIDItLjkgMi0yIDJ6bTMuMS05SDguOVY2YzAtMS43MSAxLjM5LTMuMSAzLjEtMy4xIDEuNzEgMCAzLjEgMS4zOSAzLjEgMy4xdjJ6Ii8+PC9zdmc+');
+}
+
+.notification-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTcuNTggNEguOTFDLjQgNC44OSAwIDUuNzQgMCA2Ljc2djQuNzZjMCAuODQuMTcgMS43LjQ0IDIuNDhoMS4xNUM0LjI0IDE0IDYgMTIuMjQgNiA5LjVzLTEuNzYtNC41LTMuOTEtNC41aC01LjVaTTE3LjkxIDRoLS41YzIuMTUgMCAzLjkxIDIuMDEgMy45MSA0LjVTMTkuNTYgMTMgMTcuNDEgMTNoMS4wNmMuMjctLjc4LjQ0LTEuNjQuNDQtMi40OFY2Ljc2YzAtMS4wMi0uNC0xLjg3LS45MS0yLjc2aC4wMVoiLz48cGF0aCBkPSJNMTYgMTZIMmExIDEgMCAwMDAgMmgxNGExIDEgMCAwMDAtMloiLz48L3N2Zz4=');
+}
+
+.about-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJ2LTJoMnYyeiIvPjwvc3ZnPg==');
+}
+
+.feedback-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTIwIDJINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE2YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWNGMwLTEuMS0uOS0yLTItMnptLTIgMTJIOHYtMmgxMHYyem0wLTNIOHYtMmgxMHYyem0wLTNIOHYtMmgxMHYyeiIvPjwvc3ZnPg==');
+}
+
+.terms-icon {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzNmNTFiNSI+PHBhdGggZD0iTTE0IDJIOGMtMS4xIDAtMiAuOS0yIDJ2MTZjMCAxLjEuODkgMiAxLjk5IDJIMThjMS4xIDAgMi0uOSAyLTJWOGwtNi02em0yIDEyaC04di0yaDE0djJ6bS04IDRoLTJ2LTJoMnYyem0wLTRoLTJ2LTJoMnYyem0wLTRoLTJWOGgydjJ6bTMgOGgtM3YtMmgzdjJ6bTAtNGgtM3YtMmgzdjJ6bTAtNGgtM1Y4aDN2MnoiLz48L3N2Zz4=');
+}
+
+.item-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.item-arrow {
+  width: 16rpx;
+  height: 16rpx;
+  border-top: 2rpx solid #999;
+  border-right: 2rpx solid #999;
+  transform: rotate(45deg);
+}
+
+/* 退出登录按钮 */
+.logout-btn {
+  width: 90%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #fff;
+  color: #ff3b30;
+  font-size: 30rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  margin: 60rpx auto 20rpx;
+}
+
+/* 版本信息 */
+.version-info {
+  text-align: center;
+  padding: 30rpx 0;
+}
+
+.version-text {
+  font-size: 24rpx;
+  color: #999;
+}

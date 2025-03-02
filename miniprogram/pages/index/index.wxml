@@ -1,0 +1,46 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 加载中状态 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <image class="loading-icon" src="/assets/images/loading.gif"></image>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 错误提示 -->
+    <view wx:elif="{{error}}" class="error-container">
+      <icon type="warn" size="64"></icon>
+      <text class="error-title">加载失败</text>
+      <text class="error-message">{{errorMessage}}</text>
+      <button class="retry-button" bind:tap="retry">重试</button>
+    </view>
+
+    <!-- 内容区域 -->
+    <view wx:else class="content-container">
+      <view class="welcome-section">
+        <text class="welcome-title">欢迎使用小艺医疗</text>
+        <text class="welcome-subtitle">您的健康管家</text>
+      </view>
+
+      <view class="feature-list">
+        <navigator url="/pages/healthRecord/healthRecord" class="feature-item">
+          <view class="feature-icon health-icon"></view>
+          <text class="feature-title">健康记录</text>
+          <text class="feature-desc">记录体重、血压等指标</text>
+        </navigator>
+
+        <navigator url="/pages/statistics/statistics" class="feature-item">
+          <view class="feature-icon stats-icon"></view>
+          <text class="feature-title">健康统计</text>
+          <text class="feature-desc">查看健康趋势分析</text>
+        </navigator>
+
+        <navigator url="/pages/profile/profile" class="feature-item">
+          <view class="feature-icon profile-icon"></view>
+          <text class="feature-title">个人中心</text>
+          <text class="feature-desc">管理个人信息</text>
+        </navigator>
+      </view>
+    </view>
+  </view>
+</scroll-view>

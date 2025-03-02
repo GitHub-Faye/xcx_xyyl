@@ -1,0 +1,81 @@
+<view class="container">
+  <!-- 筛选选项 -->
+  <view class="filter-container">
+    <view class="filter-item">
+      <text class="filter-label">健康数据类型</text>
+      <picker bindchange="onTypeChange" value="{{typeIndex}}" range="{{typeOptions}}">
+        <view class="picker-value">{{typeOptions[typeIndex]}}</view>
+      </picker>
+    </view>
+    <view class="filter-item">
+      <text class="filter-label">时间范围</text>
+      <picker bindchange="onPeriodChange" value="{{periodIndex}}" range="{{periodOptions}}">
+        <view class="picker-value">{{periodOptions[periodIndex]}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-card">
+    <view class="stats-header">
+      <text class="stats-title">{{typeOptions[typeIndex]}}统计</text>
+    </view>
+    <view class="stats-content">
+      <view class="stat-item">
+        <text class="stat-label">平均值</text>
+        <text class="stat-value">{{stats.average || '--'}} {{stats.unit}}</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">最高值</text>
+        <text class="stat-value">{{stats.max || '--'}} {{stats.unit}}</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">最低值</text>
+        <text class="stat-value">{{stats.min || '--'}} {{stats.unit}}</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">记录次数</text>
+        <text class="stat-value">{{stats.count || 0}}次</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 趋势数据 -->
+  <view class="chart-container">
+    <view class="chart-header">
+      <text class="chart-title">{{typeOptions[typeIndex]}}趋势</text>
+      <text class="chart-subtitle">{{chartSubtitle}}</text>
+    </view>
+    <view class="chart-content">
+      <view wx:if="{{!chartData || chartData.length === 0}}" class="no-data">
+        <text>暂无数据</text>
+      </view>
+      <view wx:else class="data-list">
+        <!-- 使用列表显示数据 -->
+        <view class="data-list-header">
+          <text class="data-list-cell">日期</text>
+          <text class="data-list-cell">数值 ({{stats.unit}})</text>
+        </view>
+        <scroll-view scroll-y="true" class="data-list-body">
+          <view wx:for="{{chartData}}" wx:key="date" class="data-list-row">
+            <text class="data-list-cell">{{item.date}}</text>
+            <text class="data-list-cell">{{item.value}}</text>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="tips-container">
+    <view class="tip-item">
+      <text class="tip-title">健康提示</text>
+      <text class="tip-content">{{healthTip}}</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading"></view>
+  </view>
+</view>
