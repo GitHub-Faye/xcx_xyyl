@@ -32,7 +32,32 @@ Page({
       this.setData({ loading: true });
       console.log('开始微信登录流程');
       
-      const response = await wxLogin();
+      // 检查网络状态
+      const networkType = await this.checkNetworkStatus();
+      if (networkType === 'none') {
+        wx.showToast({
+          title: '网络连接不可用，请检查网络设置',
+          icon: 'none',
+          duration: 2000
+        });
+        this.setData({ loading: false });
+        return;
+      }
+      
+      // 测试后端服务器连接
+      const isServerAvailable = await this.testServerConnection();
+      if (!isServerAvailable) {
+        wx.showModal({
+          title: '服务器连接失败',
+          content: '无法连接到服务器，请确保后端服务已启动或联系管理员检查服务器状态',
+          showCancel: false
+        });
+        this.setData({ loading: false });
+        return;
+      }
+      
+      // 尝试登录，设置最大重试次数为2
+      const response = await wxLogin(2);
       console.log('登录成功，收到响应数据:', response);
       
       // 检查用户信息是否正确
@@ -54,13 +79,88 @@ Page({
     } catch (error) {
       console.error('登录失败', error);
       
-      wx.showToast({
-        title: '登录失败，请重试',
-        icon: 'none'
+      // 根据错误类型显示不同的错误信息
+      let errorMessage = '登录失败，请重试';
+      if (error instanceof Error) {
+        if (error.message.includes('INVALID_LOGIN') || error.message.includes('access_token expired')) {
+          errorMessage = '微信登录凭证已过期，请重启微信或开发者工具后重试';
+        } else if (error.message.includes('网络')) {
+          errorMessage = '网络连接不稳定，请检查网络后重试';
+        }
+      }
+      
+      wx.showModal({
+        title: '登录失败',
+        content: errorMessage,
+        confirmText: '重试',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            // 用户点击重试，重新尝试登录
+            setTimeout(() => {
+              this.handleLogin();
+            }, 1000);
+          }
+        }
       });
     } finally {
       this.setData({ loading: false });
     }
+  },
+  
+  // 检查网络状态
+  checkNetworkStatus(): Promise<string> {
+    return new Promise((resolve) => {
+      wx.getNetworkType({
+        success: (res) => {
+          resolve(res.networkType);
+        },
+        fail: () => {
+          resolve('unknown');
+        }
+      });
+    });
+  },
+  
+  // 测试服务器连接
+  testServerConnection(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const app = getApp<IAppOption>();
+      const apiBaseUrl = app.globalData.apiBaseUrl;
+      
+      console.log('测试服务器连接:', apiBaseUrl);
+      
+      // 尝试发送一个简单的请求测试连接性
+      // 使用API根路径而不是特定端点，因为不确定后端有哪些端点
+      wx.request({
+        url: 'https://wyw123.pythonanywhere.com/api/',
+        method: 'GET',
+        timeout: 10000,
+        success: (res) => {
+          console.log('服务器连接测试成功:', res);
+          resolve(true);
+        },
+        fail: (err) => {
+          console.error('服务器连接测试失败:', err);
+          
+          // 尝试直接访问网站根路径
+          wx.request({
+            url: 'https://wyw123.pythonanywhere.com/',
+            method: 'GET',
+            timeout: 10000,
+            success: (res) => {
+              console.log('网站根路径访问成功:', res);
+              console.log('API路径可能不正确，但服务器是可用的');
+              resolve(true);
+            },
+            fail: (err2) => {
+              console.error('网站根路径访问失败:', err2);
+              resolve(false);
+            }
+          });
+        }
+      });
+    });
   },
   
   // 显示隐私政策

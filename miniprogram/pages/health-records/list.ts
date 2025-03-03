@@ -1,9 +1,16 @@
 import { 
-  getHealthRecords, 
-  deleteHealthRecord, 
-  HealthRecord 
+  HealthRecord, 
+  HealthRecordService
 } from '../../api/health';
 import { handleApiError } from '../../utils/request';
+
+// 分页返回结果接口
+interface PaginatedResult<T> {
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+  results: T[];
+}
 
 // 图标映射
 const iconMap = {
@@ -17,24 +24,14 @@ const iconMap = {
 interface ExtendedHealthRecord extends HealthRecord {
   typeIcon?: string;
   typeName?: string;
-  measureTimeFormatted?: string;
   formattedDate?: string;
   formattedTime?: string;
-  icon?: string;
-  systolicPressure?: number;
-  diastolicPressure?: number;
-  bloodSugar?: number;
-  weight?: number;
-  temperature?: number;
-  heartRate?: number; // 添加心率字段
-  measureTime?: string;
-  createdAt?: string;
 }
 
 // 健康记录列表页
 Page({
   data: {
-    records: [] as HealthRecord[],
+    records: [] as ExtendedHealthRecord[],
     loading: false,
     currentPage: 1,
     pageSize: 10,
@@ -68,15 +65,20 @@ Page({
     startDate.setDate(today.getDate() - 30);
     
     this.setData({
-      today: this.formatDate(today),
-      endDate: this.formatDate(today),
-      startDate: this.formatDate(startDate)
+      today: HealthRecordService.formatDate(today),
+      endDate: HealthRecordService.formatDate(today),
+      startDate: HealthRecordService.formatDate(startDate)
     });
     
     this.loadHealthRecords();
   },
 
   onPullDownRefresh: function() {
+    this.loadHealthRecords(true);
+  },
+  
+  onShow: function() {
+    // 页面显示时刷新列表，以显示编辑后的数据
     this.loadHealthRecords(true);
   },
 
@@ -92,7 +94,7 @@ Page({
         this.setData({ currentPage: 1, hasMore: true });
       }
 
-      // 构建查询参数，添加日期范围和类型过滤
+      // 构建查询参数
       const params: any = {
         page: this.data.currentPage,
         page_size: this.data.pageSize,
@@ -100,7 +102,7 @@ Page({
         end_date: this.data.endDate
       };
       
-      // 添加类型过滤
+      // 添加类型筛选
       if (this.data.currentType !== 'all') {
         if (this.data.currentType === 'bloodPressure') {
           params.has_blood_pressure = true;
@@ -115,29 +117,28 @@ Page({
       
       console.log('健康记录请求参数:', params);
 
-      const res = await getHealthRecords(params);
-      console.log('健康记录API响应:', res);
+      // 使用服务类获取记录
+      const result = await HealthRecordService.getList(params);
+      console.log('健康记录API响应:', result);
       
-      // 处理API响应数据，兼容直接返回数组和返回包含results字段的对象两种情况
-      let records = [];
+      // 处理API响应数据
+      let records: HealthRecord[] = [];
       let hasMore = false;
       
-      if (Array.isArray(res)) {
+      if (Array.isArray(result)) {
         // API直接返回记录数组
-        records = res;
+        records = result;
         // 简单判断：如果返回的记录数等于请求的页大小，则认为可能有更多记录
         hasMore = records.length === this.data.pageSize;
       } else {
-        // API返回包含results字段的对象
-        records = res.results || [];
-        hasMore = !!res.next;
+        // API返回包含results字段的对象（分页结果）
+        const paginatedResult = result as unknown as PaginatedResult<HealthRecord>;
+        records = paginatedResult.results || [];
+        hasMore = !!paginatedResult.next;
       }
-      
-      console.log('处理后的记录数组:', records);
       
       // 格式化记录数据
       const formattedRecords = this.formatRecords(records);
-      console.log('格式化后的记录:', formattedRecords);
       
       // 刷新或首次加载时替换数据，否则追加
       this.setData({
@@ -146,6 +147,9 @@ Page({
         hasMore,
         loading: false
       });
+      
+      // 停止下拉刷新
+      wx.stopPullDownRefresh();
     } catch (error) {
       console.error('加载健康记录失败:', error);
       this.setData({ loading: false });
@@ -154,6 +158,9 @@ Page({
         icon: 'none',
         duration: 2000
       });
+      
+      // 停止下拉刷新
+      wx.stopPullDownRefresh();
     }
   },
 
@@ -164,8 +171,8 @@ Page({
     }
   },
 
-  // 点击记录
-  onRecordTap(e: any) {
+  // 点击记录查看详情
+  viewRecordDetail(e: WechatMiniprogram.TouchEvent) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({
       url: `./edit?id=${id}`
@@ -179,35 +186,21 @@ Page({
     });
   },
 
-  // 打开操作菜单
-  onMoreTap(e: any) {
-    const { id } = e.currentTarget.dataset;
-    this.setData({
-      showActionSheet: true,
-      currentRecordId: id
-    });
-  },
-
-  // 关闭操作菜单
-  onCloseActionSheet() {
-    this.setData({
-      showActionSheet: false
-    });
-  },
-
   // 编辑记录
-  onEditRecord() {
+  onEditRecord(e: WechatMiniprogram.TouchEvent) {
+    // 使用catchtap代替阻止冒泡
+    const { id } = e.currentTarget.dataset;
     wx.navigateTo({
-      url: `./edit?id=${this.data.currentRecordId}`
+      url: `./edit?id=${id}`
     });
-    this.onCloseActionSheet();
   },
 
   // 删除记录
-  async onDeleteRecord() {
+  async onDeleteRecord(e: WechatMiniprogram.TouchEvent) {
+    // 使用catchtap代替阻止冒泡
+    const { id } = e.currentTarget.dataset;
+    
     try {
-      const recordId = this.data.currentRecordId;
-      
       // 确认删除
       const { confirm } = await wx.showModal({
         title: '确认删除',
@@ -220,16 +213,16 @@ Page({
       
       // 更新加载状态
       this.setData({
-        loadingIds: [...this.data.loadingIds, recordId]
+        loadingIds: [...this.data.loadingIds, id]
       });
       
-      // 调用删除API
-      await deleteHealthRecord(recordId);
+      // 使用服务类删除记录
+      await HealthRecordService.delete(id);
       
       // 删除成功更新列表
       this.setData({
-        records: this.data.records.filter(record => record.id !== recordId),
-        loadingIds: this.data.loadingIds.filter(id => id !== recordId)
+        records: this.data.records.filter(record => record.id !== id),
+        loadingIds: this.data.loadingIds.filter(loadingId => loadingId !== id)
       });
       
       wx.showToast({
@@ -237,183 +230,96 @@ Page({
         icon: 'success'
       });
     } catch (error) {
+      console.error('删除记录失败:', error);
+      
       this.setData({
-        loadingIds: this.data.loadingIds.filter(id => id !== this.data.currentRecordId)
+        loadingIds: this.data.loadingIds.filter(loadingId => loadingId !== id)
       });
       
       wx.showToast({
         title: handleApiError(error),
         icon: 'none'
       });
-    } finally {
-      this.onCloseActionSheet();
     }
-  },
-  
-  // 格式化日期
-  formatDate(dateString: string | Date): string {
-    let date: Date;
-    
-    if (dateString instanceof Date) {
-      date = dateString;
-    } else {
-      date = new Date(dateString);
-    }
-    
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  },
-  
-  // 格式化时间
-  formatTime(dateString: string | Date): string {
-    let date: Date;
-    
-    if (dateString instanceof Date) {
-      date = dateString;
-    } else {
-      date = new Date(dateString);
-    }
-    
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   },
 
-  // 格式化记录数据
+  // 格式化记录数据，添加UI显示所需的附加字段
   formatRecords(records: HealthRecord[]): ExtendedHealthRecord[] {
-    const { typeIcons, typeNames } = this.data;
-    
-    console.log('开始格式化记录数据:', records);
-    
     return records.map(record => {
-      const extendedRecord = record as ExtendedHealthRecord;
+      // 记录类型判断
+      let recordType = 'other';
+      let recordTypeName = '其他';
       
-      // 映射字段名称（后端到前端）
-      extendedRecord.systolicPressure = record.systolic_pressure;
-      extendedRecord.diastolicPressure = record.diastolic_pressure;
-      extendedRecord.bloodSugar = record.blood_sugar;
-      extendedRecord.measureTime = record.record_time;
-      extendedRecord.createdAt = record.created_at;
-      
-      // 确保数值字段为数字类型（处理字符串类型的数值）
-      if (typeof record.weight === 'string') {
-        extendedRecord.weight = parseFloat(record.weight);
-      } else {
-        extendedRecord.weight = record.weight;
-      }
-      
-      // 处理心率字段
-      if (typeof record.heart_rate === 'string') {
-        extendedRecord.heartRate = parseFloat(record.heart_rate);
-      } else {
-        extendedRecord.heartRate = record.heart_rate;
-      }
-      
-      // 确定记录类型
-      let recordType = '';
-      if (extendedRecord.systolicPressure && extendedRecord.diastolicPressure) {
+      if (record.systolic_pressure) {
         recordType = 'bloodPressure';
-      } else if (extendedRecord.bloodSugar !== undefined && extendedRecord.bloodSugar !== null) {
-        recordType = 'bloodSugar';
-      } else if (record.weight !== undefined && record.weight !== null) {
+        recordTypeName = '血压';
+      } else if (record.weight) {
         recordType = 'weight';
-      } else if (extendedRecord.temperature !== undefined && extendedRecord.temperature !== null) {
+        recordTypeName = '体重';
+      } else if (record.blood_sugar) {
+        recordType = 'bloodSugar';
+        recordTypeName = '血糖';
+      } else if (record.temperature) {
         recordType = 'temperature';
+        recordTypeName = '体温';
       }
       
-      console.log('记录类型判断:', record.id, recordType, '体重值:', record.weight, typeof record.weight, '心率:', record.heart_rate);
+      // 使用服务类格式化记录
+      const formattedRecord = HealthRecordService.formatRecord(record);
       
-      const formattedRecord = {
-        ...extendedRecord,
-        typeIcon: typeIcons[recordType as keyof typeof typeIcons] || '',
-        typeName: typeNames[recordType as keyof typeof typeNames] || '未知',
-        measureTimeFormatted: this.formatDateTime(extendedRecord.measureTime || extendedRecord.createdAt || ''),
-        formattedDate: this.formatDate(record.record_time),
-        formattedTime: this.formatTime(record.record_time),
-        icon: this.getRecordIcon(record)
+      // 添加UI显示需要的字段
+      const extendedRecord: ExtendedHealthRecord = {
+        ...formattedRecord,
+        typeIcon: this.data.typeIcons[recordType as keyof typeof this.data.typeIcons] || '/assets/icons/health.png',
+        typeName: recordTypeName,
       };
       
-      console.log('格式化后的记录:', formattedRecord);
-      return formattedRecord;
+      return extendedRecord;
     });
   },
 
-  // 获取记录图标
-  getRecordIcon(record: HealthRecord) {
-    if (record.systolic_pressure && record.diastolic_pressure) {
-      return iconMap.bloodPressure;
-    } else if (record.weight) {
-      return iconMap.weight;
-    } else {
-      return iconMap.temperature;
-    }
-  },
-
-  // 开始日期变化
+  // 日期范围选择 - 开始日期
   onStartDateChange(e: WechatMiniprogram.CustomEvent): void {
-    this.setData({
-      startDate: e.detail.value,
-      currentPage: 1,
-      records: [],
-      hasMore: true
+    const startDate = e.detail.value as string;
+    
+    this.setData({ 
+      startDate,
+      currentPage: 1
     });
     
-    this.loadHealthRecords();
+    // 更新后重新加载数据
+    this.loadHealthRecords(true);
   },
 
-  // 结束日期变化
+  // 日期范围选择 - 结束日期
   onEndDateChange(e: WechatMiniprogram.CustomEvent): void {
-    this.setData({
-      endDate: e.detail.value,
-      currentPage: 1,
-      records: [],
-      hasMore: true
+    const endDate = e.detail.value as string;
+    
+    this.setData({ 
+      endDate,
+      currentPage: 1
     });
     
-    this.loadHealthRecords();
+    // 更新后重新加载数据
+    this.loadHealthRecords(true);
   },
 
-  // 切换记录类型
+  // 类型选择
   changeType(e: WechatMiniprogram.TouchEvent): void {
-    const type = e.currentTarget.dataset.type as string;
+    const { type } = e.currentTarget.dataset;
     
     if (type !== this.data.currentType) {
-      this.setData({
+      this.setData({ 
         currentType: type,
-        currentPage: 1,
-        records: [],
-        hasMore: true
+        currentPage: 1
       });
       
-      this.loadHealthRecords();
+      // 更新后重新加载数据
+      this.loadHealthRecords(true);
     }
   },
 
-  // 查看记录详情
-  viewRecordDetail(e: WechatMiniprogram.TouchEvent): void {
-    const id = e.currentTarget.dataset.id as string;
-    wx.navigateTo({
-      url: `/pages/health-records/detail?id=${id}`
-    });
-  },
-
-  // 格式化日期时间
-  formatDateTime(dateString: string | Date): string {
-    let date: Date;
-    
-    if (dateString instanceof Date) {
-      date = dateString;
-    } else {
-      date = new Date(dateString);
-    }
-    
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(date.getHours()).padStart(2, '0');
-    const minute = String(date.getMinutes()).padStart(2, '0');
-    
-    return `${year}-${month}-${day} ${hour}:${minute}`;
-  },
-
-  // 加载更多记录
+  // 点击加载更多按钮
   loadMoreRecords(): void {
     if (this.data.hasMore && !this.data.loading) {
       this.loadHealthRecords();

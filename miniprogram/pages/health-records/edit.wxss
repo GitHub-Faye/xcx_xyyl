@@ -11,7 +11,7 @@
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
-.title {
+.page-title {
   font-size: 36rpx;
   font-weight: bold;
   color: #333;
@@ -20,7 +20,7 @@
 }
 
 .form-item {
-  margin-bottom: 30rpx;
+  margin-bottom: 25rpx;
 }
 
 .label {
@@ -29,7 +29,21 @@
   margin-bottom: 10rpx;
 }
 
-input, .picker-value, textarea {
+/* 日期选择器 */
+.date-picker {
+  width: 100%;
+  height: 80rpx;
+  background-color: #f5f7fa;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+input, textarea {
   width: 100%;
   height: 80rpx;
   background-color: #f5f7fa;
@@ -44,27 +58,6 @@ textarea {
   height: 160rpx;
   padding: 20rpx;
   line-height: 1.5;
-}
-
-.picker-value {
-  display: flex;
-  align-items: center;
-  color: #333;
-}
-
-.blood-pressure-container {
-  display: flex;
-  align-items: center;
-}
-
-.blood-pressure-container input {
-  flex: 1;
-}
-
-.separator {
-  margin: 0 20rpx;
-  font-size: 32rpx;
-  color: #999;
 }
 
 .form-actions {

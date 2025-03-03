@@ -17,6 +17,7 @@ interface IAppOption {
     refreshToken: string;
     apiBaseUrl: string;
     isLoggedIn: boolean;
+    useMockData: boolean;  // 是否使用模拟数据
   };
   getUserInfo(): Promise<UserInfo | null>;
   refreshTokenFunc(): Promise<boolean>;
@@ -24,6 +25,8 @@ interface IAppOption {
   checkLoginStatusAndRedirect(): Promise<void>;
   checkCurrentPage(): void;
   redirectToLogin(): void;
+  setApiBaseUrl(): void;
+  testApiEndpoints(defaultUrl: string): Promise<string | null>;
 }
 
 App<IAppOption>({
@@ -31,19 +34,108 @@ App<IAppOption>({
     userInfo: null,
     token: '',
     refreshToken: '',
-    apiBaseUrl: 'http://localhost:8000/api',
-    isLoggedIn: false  // 新增登录状态标记
+    apiBaseUrl: 'https://wyw123.pythonanywhere.com/api', // 包含/api路径
+    isLoggedIn: false,
+    useMockData: false
   },
+  
   onLaunch() {
     // 启动时检查登录状态
     console.log('应用启动，开始检查登录状态');
     
+    // 设置API基础URL
+    this.setApiBaseUrl();
+    
     // 微信开发工具环境判断
-    if (wx.getSystemInfoSync().platform === 'devtools') {
-      console.log('当前是开发者工具环境');
+    const sysInfo = wx.getSystemInfoSync();
+    console.log('系统信息:', sysInfo);
+    
+    if (sysInfo.platform === 'devtools') {
+      console.log('当前是开发者工具环境，使用本地API服务');
+    } else {
+      console.log('当前是真机环境，使用生产环境API服务');
     }
     
-    this.checkLoginStatusAndRedirect();
+    // 确保首次启动时检查登录状态
+    wx.getStorage({
+      key: 'token',
+      success: () => {
+        console.log('找到本地token，检查有效性');
+        this.checkLoginStatusAndRedirect();
+      },
+      fail: () => {
+        console.log('本地无token，直接跳转到登录页');
+        this.redirectToLogin();
+      }
+    });
+  },
+  
+  // 设置API基础URL，根据环境调整
+  setApiBaseUrl() {
+    const sysInfo = wx.getSystemInfoSync();
+    const isDevEnv = sysInfo.platform === 'devtools';
+    
+    // 默认路径
+    let defaultUrl = 'https://wyw123.pythonanywhere.com/api';
+    
+    // 检测服务器可用性并选择正确的路径
+    this.testApiEndpoints(defaultUrl).then((correctPath: string | null) => {
+      if (correctPath) {
+        this.globalData.apiBaseUrl = correctPath;
+        console.log('检测到的有效API基础URL:', correctPath);
+      } else {
+        // 如果检测失败，使用默认路径
+        this.globalData.apiBaseUrl = defaultUrl;
+        console.log('使用默认API基础URL:', defaultUrl);
+      }
+    });
+    
+    console.log('初始API基础URL:', this.globalData.apiBaseUrl);
+  },
+  
+  // 测试多个可能的API端点格式
+  testApiEndpoints(defaultUrl: string): Promise<string | null> {
+    // 可能的API格式列表
+    const possibleUrls = [
+      'https://wyw123.pythonanywhere.com/api',
+      'https://wyw123.pythonanywhere.com/api/',
+      'https://wyw123.pythonanywhere.com',
+      'https://wyw123.pythonanywhere.com/'
+    ];
+    
+    return new Promise((resolve) => {
+      let checkedCount = 0;
+      let foundValidUrl = false;
+      
+      // 测试每个可能的URL格式
+      possibleUrls.forEach(url => {
+        console.log('测试API路径:', url);
+        
+        wx.request({
+          url: url,
+          method: 'GET',
+          timeout: 5000,
+          success: (res) => {
+            console.log(`API路径 ${url} 测试成功:`, res);
+            
+            if (!foundValidUrl) {
+              foundValidUrl = true;
+              resolve(url);
+            }
+          },
+          fail: () => {
+            console.log(`API路径 ${url} 测试失败`);
+          },
+          complete: () => {
+            checkedCount++;
+            if (checkedCount === possibleUrls.length && !foundValidUrl) {
+              console.log('所有API路径测试失败，使用默认路径');
+              resolve(defaultUrl);
+            }
+          }
+        });
+      });
+    });
   },
 
   // 检查登录状态并重定向
@@ -134,8 +226,8 @@ App<IAppOption>({
     
     console.log('登录验证失败，跳转到登录页');
     
-    // 重定向到登录页
-    wx.redirectTo({
+    // 使用reLaunch而不是redirectTo，确保清除所有页面栈
+    wx.reLaunch({
       url: '/pages/auth/auth'
     });
   },

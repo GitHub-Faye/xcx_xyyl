@@ -1,11 +1,12 @@
 {
   "pages": [
-    "pages/index/index",
     "pages/auth/auth",
+    "pages/index/index",
     "pages/health-records/list",
     "pages/health-records/edit",
     "pages/statistics/statistics",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/api-test/api-test"
   ],
   "window": {
     "backgroundTextStyle": "light",

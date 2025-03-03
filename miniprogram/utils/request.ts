@@ -1,7 +1,7 @@
 // 请求配置接口
 export interface RequestOptions {
   url: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   data?: any;
   header?: Record<string, string>;
   timeout?: number;
@@ -16,18 +16,21 @@ export interface RequestError extends Error {
 }
 
 // 基础URL
-// 修改为真实的API地址（本地测试用localhost，生产环境应使用实际服务器地址）
-// 注意：微信小程序只能访问https域名或特定的开发环境域名
-const BASE_URL = 'http://localhost:8000/api'; // 本地开发环境
+// 不再硬编码BASE_URL，而是从app中获取
+// const BASE_URL = 'http://localhost:8000/api'; // 本地开发环境
 // const BASE_URL = 'https://your-api-domain.com/api'; // 生产环境
 
 // 请求函数
 export function request<T>(options: RequestOptions): Promise<T> {
   return new Promise((resolve, reject) => {
+    const app = getApp<IAppOption>();
+    const BASE_URL = app.globalData.apiBaseUrl;
+    
     // 获取token
     const token = wx.getStorageSync('token') || '';
     console.log(`准备发送请求 ${options.method} ${options.url}`);
     console.log('当前token:', token);
+    console.log('当前API基础URL:', BASE_URL);
     
     // 合并请求头
     const header = {
@@ -38,10 +41,24 @@ export function request<T>(options: RequestOptions): Promise<T> {
     
     console.log('请求头:', header);
     
-    // 完整URL
+    // 完整URL构建，确保路径连接正确
     let fullUrl = options.url;
     if (!options.url.startsWith('http')) {
-      fullUrl = BASE_URL + (options.url.startsWith('/') ? options.url : `/${options.url}`);
+      let urlPath = options.url;
+      
+      // 确保URL以/开头，但不要重复添加
+      if (!urlPath.startsWith('/')) {
+        urlPath = '/' + urlPath;
+      }
+      
+      // 确保BASE_URL和urlPath之间连接正确
+      if (BASE_URL.endsWith('/') && urlPath.startsWith('/')) {
+        fullUrl = BASE_URL + urlPath.substring(1);
+      } else if (!BASE_URL.endsWith('/') && !urlPath.startsWith('/')) {
+        fullUrl = BASE_URL + '/' + urlPath;
+      } else {
+        fullUrl = BASE_URL + urlPath;
+      }
     }
     console.log('请求完整URL:', fullUrl);
     
@@ -50,7 +67,7 @@ export function request<T>(options: RequestOptions): Promise<T> {
     
     wx.request({
       url: fullUrl,
-      method: options.method,
+      method: options.method as any,
       data: options.data,
       header,
       timeout: options.timeout || 30000,
@@ -71,10 +88,8 @@ export function request<T>(options: RequestOptions): Promise<T> {
           wx.removeStorageSync('token');
           wx.removeStorageSync('refreshToken');
           
-          // 跳转到登录页
-          wx.redirectTo({
-            url: '/pages/auth/auth'
-          });
+          // 获取app实例，使用全局方法跳转到登录页
+          app.redirectToLogin();
           
           const error: RequestError = new Error('未授权，请重新登录');
           error.statusCode = res.statusCode;
@@ -109,28 +124,39 @@ export function request<T>(options: RequestOptions): Promise<T> {
           reject(error);
         }
       },
-      fail: (err) => {
+      fail: (err: any) => {
         // 隐藏加载中
         wx.hideNavigationBarLoading();
         
         console.error('网络请求失败:', err);
+        console.error('请求失败详情:', {url: fullUrl, method: options.method, error: err});
         
-        // 添加更详细的错误日志
-        console.error('请求失败详情:', {
-          url: fullUrl,
-          method: options.method,
-          error: err
+        // 判断错误类型
+        let errorMessage = '网络请求失败';
+        if (err.errMsg) {
+          if (err.errMsg.includes('timeout')) {
+            errorMessage = '请求超时，请检查网络连接';
+          } else if (err.errMsg.includes('fail')) {
+            if (fullUrl.includes('localhost')) {
+              errorMessage = '无法连接到本地服务器，请确认后端服务是否已启动';
+            } else {
+              errorMessage = '网络连接失败，请检查网络设置或稍后重试';
+            }
+          }
+        }
+        
+        // 显示错误提示
+        wx.showModal({
+          title: '连接错误',
+          content: errorMessage,
+          showCancel: false
         });
         
-        // 显示网络错误提示
-        wx.showToast({
-          title: '网络连接失败，请检查网络设置',
-          icon: 'none',
-          duration: 2000
-        });
+        const error = new Error(err.errMsg || '网络请求失败') as RequestError;
+        error.code = err.code || -1;
+        error.statusCode = err.statusCode || 0;
+        error.data = err.data;
         
-        const error: RequestError = new Error(err.errMsg || '网络请求失败');
-        error.code = -1;  // 默认错误码
         reject(error);
       },
       complete: () => {

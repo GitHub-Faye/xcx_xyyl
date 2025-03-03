@@ -59,9 +59,8 @@ Component({
       
       if (!token) {
         console.log('用户未登录，跳转到登录页');
-        wx.redirectTo({
-          url: '/pages/auth/auth'
-        });
+        // 使用app的全局跳转方法，保持一致性
+        app.redirectToLogin();
       } else {
         // 使用全局登录检查方法
         app.checkLoginStatusAndRedirect();

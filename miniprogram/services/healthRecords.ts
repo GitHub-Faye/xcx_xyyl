@@ -50,61 +50,96 @@ export interface HealthRecordResponse {
 
 // 获取健康记录列表
 export async function getHealthRecords(params: HealthRecordQueryParams = {}): Promise<HealthRecordResponse> {
+  // 转换参数名称以匹配后端API
+  const apiParams: any = {};
+  if (params.startDate) apiParams.start_date = params.startDate;
+  if (params.endDate) apiParams.end_date = params.endDate;
+  if (params.page) apiParams.page = params.page;
+  if (params.pageSize) apiParams.page_size = params.pageSize;
+  if (params.limit) apiParams.limit = params.limit;
+  
   return request<HealthRecordResponse>({
-    url: '/health-records',
+    url: '/health-records/',
     method: 'GET',
-    data: params
+    data: apiParams
   });
 }
 
 // 获取最近的健康记录
 export async function getRecentHealthRecords(params: HealthRecordQueryParams = {}): Promise<HealthRecord[]> {
-  const defaultParams: HealthRecordQueryParams = {
+  const defaultParams: any = {
     limit: 5,
-    sortBy: 'measureTime',
-    order: 'desc',
-    ...params
+    sort_by: 'record_time',
+    order: 'desc'
   };
   
-  const response = await request<HealthRecordResponse>({
-    url: '/health-records/recent',
+  // 转换参数
+  if (params.startDate) defaultParams.start_date = params.startDate;
+  if (params.endDate) defaultParams.end_date = params.endDate;
+  if (params.limit) defaultParams.limit = params.limit;
+  
+  const response = await request<any>({
+    url: '/health-records/',
     method: 'GET',
     data: defaultParams
   });
   
-  return response.records || [];
+  return response.results || [];
 }
 
 // 获取健康记录详情
 export async function getHealthRecordDetail(id: string): Promise<HealthRecord> {
   return request<HealthRecord>({
-    url: `/health-records/${id}`,
+    url: `/health-records/${id}/`,
     method: 'GET'
   });
 }
 
 // 创建健康记录
 export async function createHealthRecord(data: Partial<HealthRecord>): Promise<HealthRecord> {
+  // 转换字段名称以匹配后端API
+  const apiData: any = {
+    record_time: data.measureTime
+  };
+  
+  if (data.systolicPressure) apiData.systolic_pressure = data.systolicPressure;
+  if (data.diastolicPressure) apiData.diastolic_pressure = data.diastolicPressure;
+  if (data.heartRate) apiData.heart_rate = data.heartRate;
+  if (data.bloodSugar) apiData.blood_sugar = data.bloodSugar;
+  if (data.weight) apiData.weight = data.weight;
+  if (data.note) apiData.note = data.note;
+  
   return request<HealthRecord>({
-    url: '/health-records',
+    url: '/health-records/',
     method: 'POST',
-    data
+    data: apiData
   });
 }
 
 // 更新健康记录
 export async function updateHealthRecord(id: string, data: Partial<HealthRecord>): Promise<HealthRecord> {
+  // 转换字段名称以匹配后端API
+  const apiData: any = {};
+  
+  if (data.measureTime) apiData.record_time = data.measureTime;
+  if (data.systolicPressure) apiData.systolic_pressure = data.systolicPressure;
+  if (data.diastolicPressure) apiData.diastolic_pressure = data.diastolicPressure;
+  if (data.heartRate) apiData.heart_rate = data.heartRate;
+  if (data.bloodSugar) apiData.blood_sugar = data.bloodSugar;
+  if (data.weight) apiData.weight = data.weight;
+  if (data.note) apiData.note = data.note;
+  
   return request<HealthRecord>({
-    url: `/health-records/${id}`,
+    url: `/health-records/${id}/`,
     method: 'PUT',
-    data
+    data: apiData
   });
 }
 
 // 删除健康记录
 export async function deleteHealthRecord(id: string): Promise<void> {
   return request<void>({
-    url: `/health-records/${id}`,
+    url: `/health-records/${id}/`,
     method: 'DELETE'
   });
 }

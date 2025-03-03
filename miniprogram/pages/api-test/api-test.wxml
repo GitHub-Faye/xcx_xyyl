@@ -1,0 +1,38 @@
+<!-- api-test.wxml -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">API测试页面</text>
+    <text class="page-desc">用于测试健康记录API</text>
+  </view>
+  
+  <view class="test-control">
+    <button class="primary-btn" bindtap="startTest" loading="{{isLoading}}">
+      开始测试
+    </button>
+  </view>
+  
+  <view class="results-container">
+    <view wx:if="{{testResults.length === 0 && !isLoading}}" class="no-results">
+      <text>点击"开始测试"按钮运行API测试</text>
+    </view>
+    
+    <view wx:if="{{isLoading}}" class="loading">
+      <text>测试运行中...</text>
+    </view>
+    
+    <view wx:if="{{testResults.length > 0}}" class="results-list">
+      <text class="section-title">测试结果:</text>
+      
+      <view wx:for="{{testResults}}" wx:key="index" class="result-item {{item.status}}">
+        <view class="result-header">
+          <text class="result-name">{{item.name}}</text>
+          <text class="result-status {{item.status}}">{{item.status}}</text>
+        </view>
+        <view class="result-message">{{item.message}}</view>
+        <view wx:if="{{item.data && item.status === 'success'}}" class="result-data">
+          <text class="data-preview">{{JSON.stringify(item.data).substring(0, 200)}}...</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 
