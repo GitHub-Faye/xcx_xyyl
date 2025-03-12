@@ -1,46 +1,79 @@
 <!--index.wxml-->
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="container">
+    <view class="page-header">
+      <view class="page-title">药物提醒</view>
+      <view class="add-btn" bindtap="navigateToAdd">
+        <text class="icon-add">+</text>
+      </view>
+    </view>
+    
+    <!-- 错误重试 -->
+    <view class="error-container" wx:if="{{error}}">
+      <view class="error-icon">❌</view>
+      <view class="error-text">{{errorMessage || '加载失败'}}</view>
+      <button class="retry-btn" bindtap="retry">重新加载</button>
+    </view>
+    
+    <!-- 药物提醒列表 -->
+    <view class="reminder-list" wx:if="{{!loading && !error && reminders.length > 0}}">
+      <view class="reminder-card" wx:for="{{reminders}}" wx:key="id">
+        <view class="reminder-header">
+          <view class="reminder-name">{{item.name}}</view>
+          <view class="reminder-actions">
+            <view class="reminder-toggle" catchtap="toggleReminder" data-id="{{item.id}}" data-active="{{item.is_active}}">
+              <switch checked="{{item.is_active}}" color="#1aad19" />
+            </view>
+            <view class="action-buttons">
+              <button class="btn-edit" catchtap="navigateToEdit" data-id="{{item.id}}">编辑</button>
+              <button class="btn-delete" catchtap="deleteReminder" data-id="{{item.id}}">删除</button>
+            </view>
+          </view>
+        </view>
+        
+        <view class="reminder-info" bindtap="navigateToDetail" data-id="{{item.id}}">
+          <view class="reminder-times">
+            <text class="icon-time">⏰</text>
+            <block wx:for="{{item.times}}" wx:for-item="time" wx:key="*this">
+              <text class="time-tag">{{time}}</text>
+            </block>
+          </view>
+          
+          <view class="reminder-frequency">
+            <text class="icon-calendar">📅</text>
+            <text wx:if="{{item.frequency === 'daily'}}">每天</text>
+            <text wx:elif="{{item.frequency === 'weekly'}}">
+              每周
+              <block wx:for="{{[0,1,2,3,4,5,6]}}" wx:for-item="index" wx:key="*this">
+                <text wx:if="{{item.weekdays[index] === '1'}}">{{['日', '一', '二', '三', '四', '五', '六'][index]}}</text>
+              </block>
+            </text>
+            <text wx:elif="{{item.frequency === 'monthly'}}">
+              每月 {{item.month_days}}日
+            </text>
+            <text wx:elif="{{item.frequency === 'custom'}}">
+              每{{item.custom_interval}}天
+            </text>
+          </view>
+        </view>
+        
+        <view class="reminder-description" wx:if="{{item.description}}">
+          {{item.description}}
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && !error && reminders.length === 0}}">
+      <view class="empty-image">📋</view>
+      <view class="empty-text">您还没有添加药物提醒</view>
+      <button class="btn-primary" bindtap="navigateToAdd">添加药物提醒</button>
+    </view>
+    
     <!-- 加载中状态 -->
-    <view wx:if="{{loading}}" class="loading-container">
-      <image class="loading-icon" src="/assets/images/loading.gif"></image>
-      <text class="loading-text">加载中...</text>
-    </view>
-
-    <!-- 错误提示 -->
-    <view wx:elif="{{error}}" class="error-container">
-      <icon type="warn" size="64"></icon>
-      <text class="error-title">加载失败</text>
-      <text class="error-message">{{errorMessage}}</text>
-      <button class="retry-button" bind:tap="retry">重试</button>
-    </view>
-
-    <!-- 内容区域 -->
-    <view wx:else class="content-container">
-      <view class="welcome-section">
-        <text class="welcome-title">欢迎使用小艺医疗</text>
-        <text class="welcome-subtitle">您的健康管家</text>
-      </view>
-
-      <view class="feature-list">
-        <navigator url="/pages/healthRecord/healthRecord" class="feature-item">
-          <view class="feature-icon health-icon"></view>
-          <text class="feature-title">健康记录</text>
-          <text class="feature-desc">记录体重、血压等指标</text>
-        </navigator>
-
-        <navigator url="/pages/statistics/statistics" class="feature-item">
-          <view class="feature-icon stats-icon"></view>
-          <text class="feature-title">健康统计</text>
-          <text class="feature-desc">查看健康趋势分析</text>
-        </navigator>
-
-        <navigator url="/pages/profile/profile" class="feature-item">
-          <view class="feature-icon profile-icon"></view>
-          <text class="feature-title">个人中心</text>
-          <text class="feature-desc">管理个人信息</text>
-        </navigator>
-      </view>
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-icon"></view>
+      <view class="loading-text">加载中...</view>
     </view>
   </view>
 </scroll-view>

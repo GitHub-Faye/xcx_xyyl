@@ -2,11 +2,15 @@
   "pages": [
     "pages/auth/auth",
     "pages/index/index",
+    "pages/medication/add",
+    "pages/medication/edit",
+    "pages/medication/detail",
     "pages/health-records/list",
     "pages/health-records/edit",
     "pages/statistics/statistics",
     "pages/profile/profile",
-    "pages/api-test/api-test"
+    "pages/api-test/api-test",
+    "pages/logs/logs"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -21,12 +25,6 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "images/home.png",
-        "selectedIconPath": "images/home_selected.png"
-      },
-      {
         "pagePath": "pages/health-records/list",
         "text": "健康记录",
         "iconPath": "images/health.png",
@@ -37,6 +35,12 @@
         "text": "数据统计",
         "iconPath": "images/chart.png",
         "selectedIconPath": "images/chart_selected.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "健康提醒",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home_selected.png"
       },
       {
         "pagePath": "pages/profile/profile",

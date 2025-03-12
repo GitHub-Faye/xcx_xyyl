@@ -34,7 +34,7 @@ App<IAppOption>({
     userInfo: null,
     token: '',
     refreshToken: '',
-    apiBaseUrl: 'https://wyw123.pythonanywhere.com/api', // 包含/api路径
+    apiBaseUrl: 'http://localhost:8000/api', // 修改为本地环境
     isLoggedIn: false,
     useMockData: false
   },
@@ -75,8 +75,8 @@ App<IAppOption>({
     const sysInfo = wx.getSystemInfoSync();
     const isDevEnv = sysInfo.platform === 'devtools';
     
-    // 默认路径
-    let defaultUrl = 'https://wyw123.pythonanywhere.com/api';
+    // 默认使用本地环境
+    let defaultUrl = 'http://localhost:8000/api';
     
     // 检测服务器可用性并选择正确的路径
     this.testApiEndpoints(defaultUrl).then((correctPath: string | null) => {
@@ -97,10 +97,10 @@ App<IAppOption>({
   testApiEndpoints(defaultUrl: string): Promise<string | null> {
     // 可能的API格式列表
     const possibleUrls = [
-      'https://wyw123.pythonanywhere.com/api',
-      'https://wyw123.pythonanywhere.com/api/',
-      'https://wyw123.pythonanywhere.com',
-      'https://wyw123.pythonanywhere.com/'
+      'http://localhost:8000/api',
+      'http://localhost:8000/api/',
+      'http://localhost:8000',
+      'http://localhost:8000/'
     ];
     
     return new Promise((resolve) => {

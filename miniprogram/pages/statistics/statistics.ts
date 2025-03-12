@@ -1,25 +1,24 @@
 import { getHealthStatistics } from '../../services/healthRecords';
+const wxCharts = require('../../utils/wxcharts.js');
 
 // 获取应用实例
 const app = getApp<IAppOption>();
 
 // 定义数据类型接口
 interface StatisticsData {
-  average: number | string;
-  max: number | string;
-  min: number | string;
+  average: string;
+  max: string;
+  min: string;
   count: number;
   unit: string;
-  chartData?: Array<{
-    date: string;
-    value: number;
-  }>;
 }
 
 // 图表数据类型
 interface ChartDataItem {
   date: string;
   value: number;
+  systolic?: number;
+  diastolic?: number;
 }
 
 // 页面数据接口
@@ -54,18 +53,19 @@ Page({
       count: 0,
       unit: ''
     },
-    chartData: [],
+    chartData: [] as ChartDataItem[],
     chartSubtitle: '加载中...',
     healthTip: '保持规律测量，关注健康变化趋势',
     loading: false
-  } as PageData,
+  },
+
+  lineChart: null as any,
 
   onLoad() {
     this.checkLoginAndLoadData();
   },
 
   onShow() {
-    // 页面显示时刷新数据
     this.checkLoginAndLoadData();
   },
 
@@ -85,12 +85,222 @@ Page({
     });
   },
 
-  async loadStatisticsData() {
-    const { typeIndex, periodIndex, typeOptions, periodOptions } = this.data;
+  createChart(chartData: ChartDataItem[]) {
+    const { typeIndex, typeOptions } = this.data;
+    const windowWidth = wx.getSystemInfoSync().windowWidth;
+    const windowHeight = wx.getSystemInfoSync().windowHeight;
+    
+    try {
+      // 准备图表数据
+      const categories = chartData.map(item => item.date);
+      let series = [];
+      
+      if (typeOptions[typeIndex] === '血压') {
+        // 血压需要显示两条线
+        series = [
+          {
+            name: '收缩压',
+            data: chartData.map(item => item.systolic || 0),
+            format: (val: number) => val + 'mmHg',
+            color: '#ff4d4f',  // 红色代表收缩压
+            type: 'line'
+          },
+          {
+            name: '舒张压',
+            data: chartData.map(item => item.diastolic || 0),
+            format: (val: number) => val + 'mmHg',
+            color: '#1890ff',  // 蓝色代表舒张压
+            type: 'line'
+          }
+        ];
+
+        // 创建血压图表
+        this.lineChart = new wxCharts({
+          canvasId: 'lineChart',
+          type: 'line',
+          categories: categories,
+          series: series,
+          width: windowWidth - 40,
+          height: 300,
+          dataLabel: true,
+          dataPointShape: true,
+          enableScroll: true,
+          legend: true,
+          extra: {
+            lineStyle: 'curve',
+            legendTextColor: '#666666',
+            gridColor: '#cccccc'
+          },
+          xAxis: {
+            disableGrid: true,
+            gridColor: '#cccccc',
+            fontColor: '#666666',
+            rotateLabel: true,
+            titleFontColor: '#666666',
+            titleFontSize: 24
+          },
+          yAxis: {
+            format: (val: number) => val.toFixed(0),
+            min: 40,
+            max: 180,
+            gridColor: '#cccccc',
+            fontColor: '#666666',
+            titleFontColor: '#666666',
+            title: 'mmHg',
+            disabled: false,
+            disableGrid: false,
+            splitLine: true
+          }
+        });
+      } else if (typeOptions[typeIndex] === '血糖') {
+        // 血糖图表配置
+        series = [{
+          name: '血糖',
+          data: chartData.map(item => item.value),
+          format: (val: number) => val.toFixed(1) + 'mmol/L',
+          color: '#722ed1'  // 紫色代表血糖
+        }];
+
+        // 创建血糖图表
+        this.lineChart = new wxCharts({
+          canvasId: 'lineChart',
+          type: 'line',
+          categories: categories,
+          series: series,
+          width: windowWidth - 40,
+          height: 300,
+          dataLabel: true,
+          dataPointShape: true,
+          enableScroll: true,
+          legend: true,
+          extra: {
+            lineStyle: 'curve',
+            legendTextColor: '#666666',
+            gridColor: '#cccccc'
+          },
+          xAxis: {
+            disableGrid: true,
+            gridColor: '#cccccc',
+            fontColor: '#666666',
+            rotateLabel: true,
+            titleFontColor: '#666666',
+            titleFontSize: 24
+          },
+          yAxis: {
+            format: (val: number) => val.toFixed(1),
+            min: 3.0,
+            max: 11.0,
+            gridColor: '#cccccc',
+            fontColor: '#666666',
+            titleFontColor: '#666666',
+            title: 'mmol/L',
+            disabled: false,
+            disableGrid: false,
+            splitLine: true
+          }
+        });
+      } else if (typeOptions[typeIndex] === '心率') {
+        // 心率图表配置
+        series = [{
+          name: '心率',
+          data: chartData.map(item => item.value),
+          format: (val: number) => val + '次/分',
+          color: '#f5222d'  // 红色代表心率
+        }];
+
+        // 创建心率图表
+        this.lineChart = new wxCharts({
+          canvasId: 'lineChart',
+          type: 'line',
+          categories: categories,
+          series: series,
+          width: windowWidth - 40,
+          height: 300,
+          dataLabel: true,
+          dataPointShape: true,
+          enableScroll: true,
+          legend: true,
+          extra: {
+            lineStyle: 'curve',
+            legendTextColor: '#666666',
+            gridColor: '#cccccc'
+          },
+          xAxis: {
+            disableGrid: true,
+            gridColor: '#cccccc',
+            fontColor: '#666666',
+            rotateLabel: true,
+            titleFontColor: '#666666',
+            titleFontSize: 24
+          },
+          yAxis: {
+            format: (val: number) => val.toFixed(0),
+            min: 40,  // 心率正常范围最低值
+            max: 120,  // 心率正常范围最高值
+            gridColor: '#cccccc',
+            fontColor: '#666666',
+            titleFontColor: '#666666',
+            title: '次/分',
+            disabled: false,
+            disableGrid: false,
+            splitLine: true
+          }
+        });
+      } else {
+        // 其他指标显示单条线
+        series = [{
+          name: typeOptions[typeIndex],
+          data: chartData.map(item => item.value),
+          format: (val: number) => val + this.getUnitByType(this.getTypeKey()),
+          color: '#1890ff'
+        }];
+
+        // 创建普通图表
+        this.lineChart = new wxCharts({
+          canvasId: 'lineChart',
+          type: 'line',
+          categories: categories,
+          series: series,
+          width: windowWidth - 40,
+          height: 200,
+          dataLabel: false,
+          dataPointShape: true,
+          enableScroll: true,
+          extra: {
+            lineStyle: 'curve'
+          },
+          xAxis: {
+            disableGrid: false,
+            gridColor: '#cccccc',
+            fontColor: '#666666'
+          },
+          yAxis: {
+            format: (val: number) => val.toFixed(1),
+            min: 0,
+            gridColor: '#cccccc',
+            fontColor: '#666666'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('创建图表失败:', error);
+      wx.showToast({
+        title: '图表渲染失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  getTypeKey(): string {
     const typeMap = ['weight', 'bloodPressure', 'bloodSugar', 'heartRate'];
+    return typeMap[this.data.typeIndex];
+  },
+
+  async loadStatisticsData() {
+    const { periodIndex, periodOptions } = this.data;
     const periodMap = ['week', 'month', 'quarter', 'all'];
     
-    const type = typeMap[typeIndex];
+    const type = this.getTypeKey();
     const period = periodMap[periodIndex];
     
     this.setData({
@@ -103,25 +313,51 @@ Page({
       
       // 处理数据
       const stats: StatisticsData = {
-        average: result.average || '--',
-        max: result.max || '--',
-        min: result.min || '--',
+        average: String(result.average || '--'),
+        max: String(result.max || '--'),
+        min: String(result.min || '--'),
         count: result.count || 0,
-        unit: this.getUnitByType(type),
-        chartData: result.data || []
+        unit: this.getUnitByType(type)
       };
       
-      // 确保将数值转换为字符串以匹配接口类型
+      let chartData = result.data || [];
+      
+      // 对日期进行格式化处理
+      if (chartData && chartData.length > 0) {
+        chartData = chartData.map((item: any) => {
+          if (type === 'bloodPressure') {
+            return {
+              ...item,
+              date: this.formatDate(item.date),
+              systolic: Number(item.systolic) || 0,
+              diastolic: Number(item.diastolic) || 0
+            };
+          } else if (type === 'bloodSugar') {
+            return {
+              ...item,
+              date: this.formatDate(item.date),
+              value: Number(item.value) || 0
+            };
+          } else {
+            return {
+              ...item,
+              date: this.formatDate(item.date),
+              value: Number(item.value) || 0
+            };
+          }
+        });
+
+        // 创建图表
+        this.createChart(chartData);
+      }
+      
+      // 设置健康提示
+      const healthTip = this.getHealthTip(type, stats);
+      
       this.setData({
-        stats: {
-          average: String(stats.average),
-          max: String(stats.max),
-          min: String(stats.min),
-          count: stats.count,
-          unit: stats.unit
-        },
-        chartData: stats.chartData || [],
-        healthTip: this.getHealthTip(type, stats)
+        stats,
+        chartData,
+        healthTip
       });
       
     } catch (error) {
@@ -153,18 +389,42 @@ Page({
   },
 
   getHealthTip(type: string, stats: StatisticsData): string {
-    // 基于健康数据类型和统计值返回健康提示
+    if (!stats || !stats.average || stats.average === '--') {
+      return '保持规律测量，关注健康变化趋势';
+    }
+
+    const avgValue = parseFloat(stats.average);
+    
     switch (type) {
-      case 'weight':
-        return '理想体重应稳定在合理范围内，剧烈波动可能反映健康问题。';
       case 'bloodPressure':
-        return '正常血压应低于140/90 mmHg，保持规律测量，控制饮食和运动。';
+        if (avgValue > 140) {
+          return '您的平均血压偏高，请注意控制饮食和运动';
+        } else if (avgValue < 90) {
+          return '您的平均血压偏低，请注意补充营养';
+        }
+        return '您的血压控制良好，请继续保持';
+        
       case 'bloodSugar':
-        return '空腹血糖应在3.9-6.1 mmol/L之间，餐后血糖应低于7.8 mmol/L。';
+        if (avgValue > 7.0) {
+          return '您的平均血糖偏高，建议控制碳水摄入，规律运动';
+        } else if (avgValue < 3.9) {
+          return '您的平均血糖偏低，请注意及时补充糖分';
+        }
+        return '您的血糖控制在理想范围，请继续保持良好的生活习惯';
+        
+      case 'weight':
+        return '保持健康的体重对身体很重要';
+        
       case 'heartRate':
-        return '正常静息心率为60-100次/分，运动员可能更低，持续异常应咨询医生。';
+        if (avgValue > 100) {
+          return '您的平均心率偏快，建议放松心情，适当运动';
+        } else if (avgValue < 60) {
+          return '您的平均心率偏慢，建议咨询医生';
+        }
+        return '您的心率在正常范围内，请继续保持';
+        
       default:
-        return '保持规律测量，关注健康变化趋势，异常情况请及时就医。';
+        return '保持规律测量，关注健康变化趋势';
     }
   },
 
@@ -195,5 +455,26 @@ Page({
     
     console.log('用户已登录，加载统计数据');
     this.loadStatisticsData();
-  }
+  },
+
+  // 格式化日期的辅助函数
+  formatDate(dateStr: string): string {
+    try {
+      // 如果日期已经是 YYYY-MM-DD 格式则直接返回
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+      }
+      
+      // 否则尝试解析并格式化
+      const date = new Date(dateStr);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      console.error('日期格式化失败:', e);
+      return dateStr; // 出错时返回原始字符串
+    }
+  },
 });

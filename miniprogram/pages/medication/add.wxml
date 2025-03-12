@@ -1,0 +1,127 @@
+<view class="container">
+  <view class="page-title">添加药物提醒</view>
+  
+  <view class="form-group">
+    <view class="form-label">药物名称 <text class="required">*</text></view>
+    <input 
+      class="form-input" 
+      placeholder="请输入药物名称" 
+      value="{{medicationForm.name}}"
+      bindinput="onNameInput"
+    />
+  </view>
+  
+  <view class="form-group">
+    <view class="form-label">用药说明</view>
+    <textarea 
+      class="form-textarea" 
+      placeholder="例如：饭后服用，忌酒等" 
+      value="{{medicationForm.description}}"
+      bindinput="onDescriptionInput"
+    />
+  </view>
+  
+  <view class="form-group">
+    <view class="form-label">服药频率 <text class="required">*</text></view>
+    <picker 
+      mode="selector" 
+      range="{{frequencyOptions}}" 
+      range-key="label"
+      value="{{frequencyIndex}}"
+      bindchange="onFrequencyChange"
+    >
+      <view class="picker-view">
+        {{frequencyOptions[frequencyIndex].label}}
+      </view>
+    </picker>
+  </view>
+  
+  <!-- 每周服药选择 -->
+  <view class="form-group" wx:if="{{medicationForm.frequency === 'weekly'}}">
+    <view class="form-label">每周服药日 <text class="required">*</text></view>
+    <checkbox-group bindchange="onWeekdayChange">
+      <view class="checkbox-list">
+        <view class="checkbox-item" wx:for="{{weekdayOptions}}" wx:key="value">
+          <checkbox 
+            value="{{item.value}}" 
+            checked="{{medicationForm.weekdays.indexOf(item.value) > -1}}"
+          />
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </checkbox-group>
+  </view>
+  
+  <!-- 每月服药选择 -->
+  <view class="form-group" wx:if="{{medicationForm.frequency === 'monthly'}}">
+    <view class="form-label">每月服药日 <text class="required">*</text></view>
+    <checkbox-group bindchange="onMonthDayChange">
+      <view class="checkbox-grid">
+        <view class="checkbox-item" wx:for="{{monthDayOptions}}" wx:key="value">
+          <checkbox 
+            value="{{item.value}}" 
+            checked="{{medicationForm.month_days.indexOf(item.value) > -1}}"
+          />
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </checkbox-group>
+  </view>
+  
+  <!-- 自定义间隔 -->
+  <view class="form-group" wx:if="{{medicationForm.frequency === 'custom'}}">
+    <view class="form-label">间隔天数 <text class="required">*</text></view>
+    <input 
+      class="form-input" 
+      type="number" 
+      placeholder="请输入间隔天数" 
+      value="{{medicationForm.custom_interval}}"
+      bindinput="onIntervalChange"
+    />
+    <view class="form-hint">表示每隔多少天服用一次</view>
+  </view>
+  
+  <!-- 服药时间 -->
+  <view class="form-group">
+    <view class="form-label">服药时间 <text class="required">*</text></view>
+    <view class="time-list">
+      <view class="time-item" wx:for="{{medicationForm.times}}" wx:key="index">
+        <picker 
+          mode="time" 
+          value="{{item}}"
+          bindchange="onTimeChange"
+          data-index="{{index}}"
+        >
+          <view class="time-picker">
+            {{item}}
+          </view>
+        </picker>
+        <view class="time-delete" catchtap="removeTime" data-index="{{index}}" wx:if="{{medicationForm.times.length > 1}}">
+          <text class="icon-delete">✖</text>
+        </view>
+      </view>
+    </view>
+    <view class="add-time-btn" bindtap="addMedicationTime">
+      <text class="icon-add">➕</text> 添加服药时间
+    </view>
+  </view>
+  
+  <!-- 结束日期 -->
+  <view class="form-group">
+    <view class="form-label">结束日期 (可选)</view>
+    <picker 
+      mode="date" 
+      value="{{medicationForm.end_date}}"
+      start="{{today}}"
+      bindchange="onEndDateChange"
+    >
+      <view class="picker-view">
+        {{medicationForm.end_date || '无结束日期'}}
+      </view>
+    </picker>
+  </view>
+  
+  <view class="btn-group">
+    <button class="btn-primary" bindtap="saveReminder">保存</button>
+  </view>
+</view> 

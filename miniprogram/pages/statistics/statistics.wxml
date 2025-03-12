@@ -50,19 +50,7 @@
       <view wx:if="{{!chartData || chartData.length === 0}}" class="no-data">
         <text>暂无数据</text>
       </view>
-      <view wx:else class="data-list">
-        <!-- 使用列表显示数据 -->
-        <view class="data-list-header">
-          <text class="data-list-cell">日期</text>
-          <text class="data-list-cell">数值 ({{stats.unit}})</text>
-        </view>
-        <scroll-view scroll-y="true" class="data-list-body">
-          <view wx:for="{{chartData}}" wx:key="date" class="data-list-row">
-            <text class="data-list-cell">{{item.date}}</text>
-            <text class="data-list-cell">{{item.value}}</text>
-          </view>
-        </scroll-view>
-      </view>
+      <canvas wx:else canvas-id="lineChart" class="chart-canvas"></canvas>
     </view>
   </view>
 

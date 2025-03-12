@@ -1,4 +1,4 @@
-.container {
+  .container {
   min-height: 100vh;
   padding: 30rpx;
   background-color: #f7f9fc;
@@ -86,38 +86,42 @@
 
 /* 图表样式 */
 .chart-container {
+  width: 100%;
   background-color: #fff;
   border-radius: 12rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-  margin-bottom: 20rpx;
-  overflow: hidden;
+  margin: 20rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
 }
 
 .chart-header {
-  padding: 24rpx;
-  border-bottom: 1rpx solid #eee;
+  padding: 20rpx;
 }
 
 .chart-title {
   font-size: 32rpx;
-  color: #333;
   font-weight: bold;
-  display: block;
+  color: #333;
 }
 
 .chart-subtitle {
   font-size: 24rpx;
-  color: #999;
-  margin-top: 6rpx;
-  display: block;
+  color: #666;
+  margin-left: 20rpx;
 }
 
 .chart-content {
-  height: 400rpx;
+  width: 100%;
+  height: 500rpx;
   position: relative;
 }
 
-.chart-canvas-container {
+.chart-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-canvas {
   width: 100%;
   height: 100%;
 }
@@ -179,4 +183,63 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* 数据列表样式 */
+.data-list {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.data-list-header {
+  display: flex;
+  background-color: #f0f4ff;
+  padding: 20rpx 30rpx;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.data-list-body {
+  height: 600rpx;
+  width: 100%;
+}
+
+.data-list-row {
+  display: flex;
+  padding: 20rpx 30rpx;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.even-row {
+  background-color: #f9f9f9;
+}
+
+.odd-row {
+  background-color: #ffffff;
+}
+
+.data-list-cell-date {
+  flex: 1;
+  color: #666;
+  font-size: 28rpx;
+  padding-right: 20rpx;
+}
+
+.data-list-cell-value {
+  flex: 1;
+  text-align: right;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #3f51b5;
+}
+
+/* 如果存在.data-list-cell的旧样式，保留它以避免影响其他地方 */
+.data-list-cell {
+  flex: 1;
+  padding: 10rpx;
+  text-align: center;
 }

@@ -12,9 +12,7 @@ page {
 }
 
 .container {
-  padding: 20rpx;
-  box-sizing: border-box;
-  min-height: 100vh;
+  padding: 30rpx;
 }
 
 .userinfo {
@@ -197,4 +195,206 @@ page {
   font-size: 24rpx;
   color: #666;
   display: block;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.add-btn {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: #1aad19;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 40rpx;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.reminder-list {
+  margin-top: 20rpx;
+}
+
+.reminder-card {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.reminder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.reminder-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.reminder-info {
+  margin-top: 20rpx;
+}
+
+.reminder-times, .reminder-frequency {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+  color: #666;
+  font-size: 28rpx;
+}
+
+.icon-time, .icon-calendar {
+  margin-right: 10rpx;
+  color: #1aad19;
+}
+
+.time-tag {
+  background-color: #f0f9eb;
+  color: #67c23a;
+  border-radius: 4rpx;
+  padding: 4rpx 12rpx;
+  margin-right: 10rpx;
+  font-size: 24rpx;
+}
+
+.reminder-description {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 15rpx;
+  line-height: 1.5;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-image {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.btn-primary {
+  background-color: #1aad19;
+  color: #fff;
+  border: none;
+  padding: 12rpx 40rpx;
+  border-radius: 8rpx;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 0;
+}
+
+.loading-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #1aad19;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.error-icon {
+  font-size: 60rpx;
+  margin-bottom: 20rpx;
+}
+
+.error-text {
+  font-size: 30rpx;
+  color: #f56c6c;
+  margin-bottom: 30rpx;
+}
+
+.retry-btn {
+  background-color: #f56c6c;
+  color: #fff;
+  padding: 10rpx 30rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.reminder-actions {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10rpx;
+}
+
+.btn-edit, .btn-delete {
+  margin: 0;
+  padding: 0 20rpx;
+  font-size: 24rpx;
+  line-height: 1.8;
+  min-height: unset;
+  border-radius: 30rpx;
+}
+
+.btn-edit {
+  background-color: #f0f9eb;
+  color: #67c23a;
+  border: 1rpx solid #67c23a;
+}
+
+.btn-delete {
+  background-color: #fef0f0;
+  color: #f56c6c;
+  border: 1rpx solid #f56c6c;
+}
+
+.reminder-info {
+  cursor: pointer;
 }
