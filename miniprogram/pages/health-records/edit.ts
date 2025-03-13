@@ -64,7 +64,7 @@ Page({
       // 将数字类型转为字符串用于表单显示
       const formRecord: HealthRecordForm = {
         id: record.id,
-        recordDate: record.record_time.split(' ')[0], // 只取日期部分
+        recordDate: record.record_time.split('T')[0], // 只取日期部分
         weight: record.weight?.toString() || '',
         systolic_pressure: record.systolic_pressure?.toString() || '',
         diastolic_pressure: record.diastolic_pressure?.toString() || '',
@@ -242,10 +242,9 @@ Page({
       // 准备记录数据
       const { record } = this.data;
       
-      // 构建完整的日期时间字符串（使用当前时间）
+      // 构建ISO 8601格式的日期时间字符串
       const now = new Date();
-      const timeStr = this.formatTime(now);
-      const record_time = `${record.recordDate} ${timeStr}`;
+      const record_time = now.toISOString();
       
       const healthRecord: HealthRecord = {
         id: this.data.isEdit ? this.data.recordId : undefined,

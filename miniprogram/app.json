@@ -8,7 +8,6 @@
     "pages/health-records/list",
     "pages/health-records/edit",
     "pages/statistics/statistics",
-    "pages/profile/profile",
     "pages/api-test/api-test",
     "pages/logs/logs"
   ],
@@ -19,6 +18,7 @@
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
+    "custom": true,
     "color": "#999999",
     "selectedColor": "#3f51b5",
     "backgroundColor": "#ffffff",
@@ -26,27 +26,15 @@
     "list": [
       {
         "pagePath": "pages/health-records/list",
-        "text": "健康记录",
-        "iconPath": "images/health.png",
-        "selectedIconPath": "images/health_selected.png"
+        "text": "健康记录"
       },
       {
         "pagePath": "pages/statistics/statistics",
-        "text": "数据统计",
-        "iconPath": "images/chart.png",
-        "selectedIconPath": "images/chart_selected.png"
+        "text": "数据统计"
       },
       {
         "pagePath": "pages/index/index",
-        "text": "健康提醒",
-        "iconPath": "images/home.png",
-        "selectedIconPath": "images/home_selected.png"
-      },
-      {
-        "pagePath": "pages/profile/profile",
-        "text": "我的",
-        "iconPath": "images/profile.png",
-        "selectedIconPath": "images/profile_selected.png"
+        "text": "健康提醒"
       }
     ]
   },

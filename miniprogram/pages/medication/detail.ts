@@ -7,7 +7,7 @@ interface MedicationReminder {
   weekdays?: string;
   month_days?: string;
   custom_interval?: number;
-  times: string;
+  times: string;  // 始终使用字符串类型，用逗号分隔的时间列表
   is_active: boolean;
   end_date?: string;
 }
@@ -61,8 +61,14 @@ Page({
       },
       success: (res: any) => {
         if (res.statusCode === 200) {
+          // 确保times字段是字符串
+          const reminder = {
+            ...res.data,
+            times: Array.isArray(res.data.times) ? res.data.times.join(',') : res.data.times
+          };
+          
           this.setData({
-            reminder: res.data,
+            reminder,
             loading: false
           });
         } else {
@@ -89,6 +95,30 @@ Page({
     const reminder = this.data.reminder;
     const newStatus = !reminder.is_active;
     
+    // 验证times字段
+    if (!reminder.times) {
+      wx.showToast({
+        title: '服药时间不能为空',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 确保times是字符串且格式正确
+    const times = Array.isArray(reminder.times) 
+      ? reminder.times.join(',') 
+      : reminder.times;
+    
+    // 验证times格式
+    const timePattern = /^([0-9]{2}:[0-9]{2},)*([0-9]{2}:[0-9]{2})$/;
+    if (!timePattern.test(times)) {
+      wx.showToast({
+        title: '服药时间格式错误',
+        icon: 'none'
+      });
+      return;
+    }
+    
     wx.showLoading({
       title: newStatus ? '正在启用...' : '正在停用...'
     });
@@ -105,13 +135,21 @@ Page({
     
     wx.request({
       url: apiUrl,
-      method: 'PUT' as 'PUT',
+      method: 'PATCH' as WechatMiniprogram.RequestOption['method'],
       header: {
         'Authorization': `Bearer ${globalApp.globalData.token}`,
         'Content-Type': 'application/json'
       },
       data: {
-        is_active: newStatus
+        is_active: newStatus,
+        name: reminder.name,
+        description: reminder.description,
+        frequency: reminder.frequency,
+        weekdays: reminder.weekdays,
+        month_days: reminder.month_days,
+        custom_interval: reminder.custom_interval,
+        times: times,
+        end_date: reminder.end_date
       },
       success: (res: any) => {
         wx.hideLoading();
@@ -124,13 +162,15 @@ Page({
             icon: 'success'
           });
         } else {
+          console.error('更新提醒状态失败:', res.data);
           wx.showToast({
-            title: '操作失败',
+            title: res.data?.message || '操作失败',
             icon: 'none'
           });
         }
       },
-      fail: () => {
+      fail: (err) => {
+        console.error('网络请求失败:', err);
         wx.hideLoading();
         wx.showToast({
           title: '网络请求失败',

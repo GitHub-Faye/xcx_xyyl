@@ -1,6 +1,15 @@
 // app.ts
 App<IAppOption>({
-  globalData: {},
+  globalData: {
+    baseURL: 'http://localhost:8000',
+    token: '',
+    userInfo: null,
+    systemInfo: null,
+    // 组件注入相关配置
+    injectComponents: true,
+    themeMode: 'light'
+  },
+
   onLaunch() {
     // 检查更新
     this.checkUpdate();
@@ -17,6 +26,32 @@ App<IAppOption>({
         showCancel: false
       });
     }
+
+    // 初始化组件注入
+    this.initComponentInjection();
+
+    // 从本地缓存获取用户令牌
+    const token = wx.getStorageSync('token');
+    if (token) {
+      this.globalData.token = token;
+    }
+  },
+  
+  // 初始化组件注入功能
+  initComponentInjection() {
+    if (wx.canIUse('styleIsolation') && wx.canIUse('componentPlaceholder')) {
+      console.log('组件注入功能已启用');
+      this.globalData.injectComponents = true;
+    } else {
+      console.log('当前环境不支持组件注入功能');
+      this.globalData.injectComponents = false;
+    }
+
+    // 监听系统主题变化
+    wx.onThemeChange((result) => {
+      this.globalData.themeMode = result.theme;
+      console.log('系统主题已切换为:', result.theme);
+    });
   },
   
   // 检查小程序更新

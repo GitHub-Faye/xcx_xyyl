@@ -1,0 +1,8 @@
+<!-- components/loading/loading.wxml -->
+<view class="loading-container {{themeClass}}" id="loading">
+  <view class="loading-mask"></view>
+  <view class="loading-body">
+    <view class="loading-indicator"></view>
+    <text class="loading-text">{{title}}</text>
+  </view>
+</view> 

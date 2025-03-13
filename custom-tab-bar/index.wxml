@@ -1,0 +1,26 @@
+<view class="tab-bar">
+  <view class="tab-bar-item {{active === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0" data-path="/pages/index/index">
+    <view class="icon-wrapper">
+      <view class="icon icon-medicine"></view>
+    </view>
+    <view class="tab-label">健康提醒</view>
+  </view>
+  <view class="tab-bar-item {{active === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1" data-path="/pages/health-records/list">
+    <view class="icon-wrapper">
+      <view class="icon icon-record"></view>
+    </view>
+    <view class="tab-label">健康记录</view>
+  </view>
+  <view class="tab-bar-item {{active === 2 ? 'active' : ''}}" bindtap="switchTab" data-index="2" data-path="/pages/health-statistics/index">
+    <view class="icon-wrapper">
+      <view class="icon icon-chart"></view>
+    </view>
+    <view class="tab-label">数据统计</view>
+  </view>
+  <view class="tab-bar-item {{active === 3 ? 'active' : ''}}" bindtap="switchTab" data-index="3" data-path="/pages/user/profile">
+    <view class="icon-wrapper">
+      <view class="icon icon-profile"></view>
+    </view>
+    <view class="tab-label">我的</view>
+  </view>
+</view> 

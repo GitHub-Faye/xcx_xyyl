@@ -1,0 +1,47 @@
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  max-width: 80%;
+  padding: 20rpx 30rpx;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-message {
+  color: #ffffff;
+  font-size: 28rpx;
+  margin-left: 10rpx;
+}
+
+/* 类型样式 */
+.toast.success {
+  background-color: rgba(39, 174, 96, 0.9);
+}
+
+.toast.error {
+  background-color: rgba(231, 76, 60, 0.9);
+}
+
+.toast.warning {
+  background-color: rgba(241, 196, 15, 0.9);
+}
+
+.toast.info {
+  background-color: rgba(41, 128, 185, 0.9);
+}
+
+/* 主题适配 */
+.theme-dark.toast {
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+} 

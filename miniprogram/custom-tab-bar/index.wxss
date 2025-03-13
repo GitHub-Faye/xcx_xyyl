@@ -1,0 +1,171 @@
+/* TabBar容器 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110rpx;
+  background: white;
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid #f5f5f5;
+  z-index: 999;
+}
+
+/* TabBar项 */
+.tab-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #999999;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-bar-item:active {
+  background-color: transparent;
+}
+
+.tab-bar-item.active {
+  color: #999999;
+}
+
+/* 图标包装器 */
+.icon-wrapper {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+/* 基本图标样式 */
+.icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: relative;
+}
+
+/* 健康记录图标 */
+.icon-record {
+  width: 45rpx;
+  height: 50rpx;
+  background-color: #999999;
+  border-radius: 4rpx;
+  position: relative;
+}
+
+.icon-record:before,
+.icon-record:after {
+  content: '';
+  position: absolute;
+  left: 10rpx;
+  right: 10rpx;
+  height: 3rpx;
+  background-color: white;
+}
+
+.icon-record:before {
+  top: 15rpx;
+}
+
+.icon-record:after {
+  top: 25rpx;
+}
+
+.icon-record.active-icon {
+  background-color: #999999;
+}
+
+/* 数据统计图标 */
+.icon-chart {
+  width: 50rpx;
+  height: 50rpx;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.icon-chart:before,
+.icon-chart:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 10rpx;
+  background-color: #999999;
+}
+
+.icon-chart:before {
+  left: 8rpx;
+  height: 25rpx;
+}
+
+.icon-chart:after {
+  left: 26rpx;
+  height: 35rpx;
+}
+
+.icon-chart::after {
+  content: '';
+  position: absolute;
+  right: 8rpx;
+  bottom: 0;
+  width: 10rpx;
+  height: 15rpx;
+  background-color: #999999;
+}
+
+.icon-chart.active-icon:before,
+.icon-chart.active-icon:after,
+.icon-chart.active-icon::after {
+  background-color: #999999;
+}
+
+/* 健康提醒图标 */
+.icon-reminder {
+  width: 45rpx;
+  height: 45rpx;
+  border: 3rpx solid #999999;
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-reminder:before {
+  content: '';
+  position: absolute;
+  top: 10rpx;
+  left: 50%;
+  width: 3rpx;
+  height: 15rpx;
+  background-color: #999999;
+  transform: translateX(-50%);
+}
+
+.icon-reminder:after {
+  content: '';
+  position: absolute;
+  top: 18rpx;
+  left: 50%;
+  width: 15rpx;
+  height: 3rpx;
+  background-color: #999999;
+  transform: translateX(-50%);
+}
+
+.icon-reminder.active-icon {
+  border-color: #999999;
+}
+
+.icon-reminder.active-icon:before,
+.icon-reminder.active-icon:after {
+  background-color: #999999;
+}
+
+/* TabBar标签文本 */
+.tab-label {
+  font-size: 24rpx;
+  margin-top: 2rpx;
+} 

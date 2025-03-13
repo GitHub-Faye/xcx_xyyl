@@ -1,6 +1,9 @@
 /* 列表页样式 */
 .container {
   padding: 30rpx;
+  padding-bottom: 150rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .page-header {
@@ -11,22 +14,22 @@
 }
 
 .page-title {
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: bold;
-  color: #333;
+  color: #333333;
 }
 
 .add-btn {
   width: 80rpx;
   height: 80rpx;
+  background-color: #4785ff;
+  color: white;
   border-radius: 50%;
-  background-color: #1aad19;
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: #fff;
-  font-size: 40rpx;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  font-size: 48rpx;
+  box-shadow: 0 4rpx 8rpx rgba(71, 133, 255, 0.3);
 }
 
 .reminder-list {
@@ -34,56 +37,56 @@
 }
 
 .reminder-card {
-  background-color: #fff;
-  border-radius: 12rpx;
-  padding: 24rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
 .reminder-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15rpx;
+  margin-bottom: 20rpx;
 }
 
 .reminder-name {
-  font-size: 32rpx;
+  font-size: 34rpx;
   font-weight: 500;
-  color: #333;
+  color: #333333;
 }
 
 .reminder-info {
-  margin-top: 20rpx;
+  margin-bottom: 16rpx;
 }
 
 .reminder-times, .reminder-frequency {
   display: flex;
   align-items: center;
   margin-bottom: 10rpx;
-  color: #666;
-  font-size: 28rpx;
+  flex-wrap: wrap;
 }
 
 .icon-time, .icon-calendar {
   margin-right: 10rpx;
-  color: #1aad19;
+  font-size: 32rpx;
 }
 
 .time-tag {
-  background-color: #f0f9eb;
-  color: #67c23a;
-  border-radius: 4rpx;
-  padding: 4rpx 12rpx;
-  margin-right: 10rpx;
+  background-color: #f0f7ff;
+  color: #4785ff;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
   font-size: 24rpx;
+  margin-right: 10rpx;
+  margin-bottom: 8rpx;
 }
 
 .reminder-description {
-  font-size: 26rpx;
-  color: #999;
-  margin-top: 15rpx;
+  font-size: 28rpx;
+  color: #999999;
+  margin-top: 20rpx;
   line-height: 1.5;
 }
 
@@ -114,29 +117,65 @@
   border-radius: 8rpx;
 }
 
-.loading-state {
+.native-loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100rpx 0;
+  justify-content: center;
+  height: 400rpx;
 }
 
 .loading-icon {
   width: 80rpx;
   height: 80rpx;
-  border: 6rpx solid #f3f3f3;
-  border-top: 6rpx solid #1aad19;
   border-radius: 50%;
+  border: 6rpx solid rgba(71, 133, 255, 0.3);
+  border-top-color: #4785ff;
   animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
 }
 
 .loading-text {
-  margin-top: 20rpx;
-  font-size: 28rpx;
-  color: #999;
+  font-size: 30rpx;
+  color: #999999;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 主题适配 */
+.theme-dark {
+  background-color: #1f1f1f;
+}
+
+.theme-dark .page-title {
+  color: #f0f0f0;
+}
+
+.theme-dark .reminder-card {
+  background-color: #2c2c2c;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .reminder-name {
+  color: #f0f0f0;
+}
+
+.theme-dark .time-tag {
+  background-color: #364c6d;
+  color: #88b0ff;
+}
+
+.theme-dark .reminder-description {
+  color: #b0b0b0;
+}
+
+.theme-dark .loading-text {
+  color: #b0b0b0;
 } 

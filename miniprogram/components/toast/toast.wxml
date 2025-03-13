@@ -1,0 +1,9 @@
+<!-- components/toast/toast.wxml -->
+<view class="toast {{themeClass}} {{type}}" id="toast">
+  <view class="toast-content">
+    <icon wx:if="{{type === 'success'}}" type="success" size="24"></icon>
+    <icon wx:elif="{{type === 'error'}}" type="warn" size="24"></icon>
+    <icon wx:elif="{{type === 'info'}}" type="info" size="24"></icon>
+    <text class="toast-message">{{message}}</text>
+  </view>
+</view> 

@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container {{themeVars}}">
   <view class="page-header">
     <view class="page-title">药物提醒</view>
     <view class="add-btn" bindtap="navigateToAdd">
@@ -51,13 +51,41 @@
     </view>
   </view>
   
-  <view class="empty-state" wx:if="{{!loading && reminders.length === 0}}">
-    <view class="empty-image">📋</view>
-    <view class="empty-text">您还没有添加药物提醒</view>
-    <button class="btn-primary" bindtap="navigateToAdd">添加药物提醒</button>
-  </view>
+  <!-- 使用用时注入的组件 -->
+  <!-- 空状态组件 - 仅在需要时才会被注入和渲染 -->
+  <empty-state wx:if="{{$emptyState}}"
+               id="emptyState"
+               icon="{{$emptyState.icon}}"
+               title="{{$emptyState.title}}"
+               message="{{$emptyState.message}}"
+               type="{{$emptyState.type}}"
+               actionText="{{$emptyState.actionText}}"
+               bind:action="handleEmptyStateAction" />
   
-  <view class="loading-state" wx:if="{{loading}}">
+  <!-- Toast组件 - 仅在需要时才会被注入和渲染 -->
+  <toast wx:if="{{$toast}}"
+         id="toast"
+         type="{{$toast.type}}"
+         message="{{$toast.message}}"
+         duration="{{$toast.duration}}" />
+  
+  <!-- Loading组件 - 仅在需要时才会被注入和渲染 -->
+  <loading-indicator wx:if="{{$loading}}"
+                    id="loading"
+                    title="{{$loading.title}}" />
+  
+  <!-- Modal组件 - 仅在需要时才会被注入和渲染 -->
+  <modal wx:if="{{$modal}}"
+         id="modal"
+         title="{{$modal.title}}"
+         content="{{$modal.content}}"
+         showCancel="{{$modal.showCancel}}"
+         cancelText="{{$modal.cancelText}}"
+         confirmText="{{$modal.confirmText}}"
+         bind:action="handleModalAction" />
+  
+  <!-- 加载中状态 - 静态渲染 -->
+  <view class="native-loading-state" wx:if="{{loading}}">
     <view class="loading-icon"></view>
     <view class="loading-text">加载中...</view>
   </view>

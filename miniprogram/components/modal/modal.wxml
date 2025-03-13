@@ -1,0 +1,20 @@
+<!-- components/modal/modal.wxml -->
+<view class="modal-container {{themeClass}}" id="modal">
+  <view class="modal-mask"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">{{title}}</text>
+    </view>
+    <view class="modal-body">
+      <text class="modal-message">{{content}}</text>
+    </view>
+    <view class="modal-footer">
+      <view wx:if="{{showCancel}}" class="modal-button cancel" data-action="cancel" bindtap="handleAction">
+        {{cancelText || '取消'}}
+      </view>
+      <view class="modal-button confirm" data-action="confirm" bindtap="handleAction">
+        {{confirmText || '确定'}}
+      </view>
+    </view>
+  </view>
+</view> 

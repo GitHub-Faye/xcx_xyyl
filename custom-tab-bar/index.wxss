@@ -1,0 +1,159 @@
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 96rpx;
+  background: white;
+  display: flex;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.tab-bar-item.active {
+  color: #4785ff;
+}
+
+.icon-wrapper {
+  height: 48rpx;
+  width: 48rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+
+.icon {
+  width: 44rpx;
+  height: 44rpx;
+  position: relative;
+}
+
+/* 使用CSS创建药物提醒图标 */
+.icon-medicine {
+  background: transparent;
+  border: 3rpx solid #999999;
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-medicine:before {
+  content: "";
+  position: absolute;
+  width: 4rpx;
+  height: 16rpx;
+  background: #999999;
+  left: 50%;
+  top: 10rpx;
+  transform: translateX(-50%);
+}
+
+.icon-medicine:after {
+  content: "";
+  position: absolute;
+  width: 16rpx;
+  height: 4rpx;
+  background: #999999;
+  left: 50%;
+  top: 16rpx;
+  transform: translateX(-50%);
+}
+
+.active .icon-medicine {
+  border-color: #4785ff;
+}
+
+.active .icon-medicine:before,
+.active .icon-medicine:after {
+  background: #4785ff;
+}
+
+/* 使用CSS创建健康记录图标 */
+.icon-record {
+  background: #999999;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 80% 100%, 0% 100%);
+}
+
+.active .icon-record {
+  background: #4785ff;
+}
+
+/* 使用CSS创建健康统计图标 */
+.icon-chart {
+  background: #999999;
+  position: relative;
+}
+
+.icon-chart:before {
+  content: "";
+  position: absolute;
+  width: 60%;
+  height: 15%;
+  background: white;
+  bottom: 10%;
+  left: 20%;
+}
+
+.icon-chart:after {
+  content: "";
+  position: absolute;
+  width: 30%;
+  height: 40%;
+  background: white;
+  bottom: 25%;
+  left: 20%;
+}
+
+.active .icon-chart {
+  background: #4785ff;
+}
+
+/* 使用CSS创建我的图标 */
+.icon-profile {
+  background: #999999;
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-profile:before {
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background: white;
+  border-radius: 50%;
+  top: 20%;
+  left: 25%;
+}
+
+.icon-profile:after {
+  content: "";
+  position: absolute;
+  width: 70%;
+  height: 35%;
+  background: white;
+  border-radius: 50% 50% 0 0;
+  bottom: 0;
+  left: 15%;
+}
+
+.active .icon-profile {
+  background: #4785ff;
+}
+
+.tab-label {
+  font-size: 22rpx;
+  line-height: 1;
+} 

@@ -1,0 +1,12 @@
+<!-- components/empty-state/empty-state.wxml -->
+<view class="empty-state {{themeClass}}" id="empty-state">
+  <view class="empty-state-icon">
+    <icon wx:if="{{icon}}" type="{{icon}}" size="64"></icon>
+    <view wx:else class="default-icon"></view>
+  </view>
+  <view class="empty-state-title">{{title || '暂无数据'}}</view>
+  <view class="empty-state-message">{{message || ''}}</view>
+  <view wx:if="{{actionText}}" class="empty-state-action" bindtap="onAction">
+    {{actionText}}
+  </view>
+</view> 
