@@ -39,7 +39,7 @@ enhancedPage({
     this.loadReminders();
   },
 
-  // 获取药物提醒列表
+  // 获取健康提醒列表
   loadReminders() {
     this.setData({ loading: true });
     
@@ -66,10 +66,10 @@ enhancedPage({
           // 如果列表为空，显示空状态
           if (reminders.length === 0) {
             this.showEmptyState({
-              title: '暂无药物提醒',
-              message: '点击右下角按钮添加药物提醒',
+              title: '暂无健康提醒',
+              message: '点击右下角按钮添加健康提醒',
               icon: 'medicine-box',
-              actionText: '添加药物提醒',
+              actionText: '添加健康提醒',
               onAction: this.navigateToAdd
             });
           } else {

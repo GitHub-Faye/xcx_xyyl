@@ -1,7 +1,7 @@
 <view class="container">
   <view class="logo-container">
     <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
-    <view class="app-name">小艺医疗</view>
+    <view class="app-name">小艺心数日志</view>
     <view class="app-slogan">您的个人健康管理助手</view>
   </view>
   

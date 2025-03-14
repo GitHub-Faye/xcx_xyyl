@@ -1,7 +1,7 @@
 // pages/medication/add.ts
 Page({
   data: {
-    // 药物提醒表单数据
+    // 健康提醒表单数据
     medicationForm: {
       name: '',
       description: '',
@@ -177,23 +177,15 @@ Page({
       title: '保存中...'
     });
 
-    const app = getApp();
-    
-    // 修复API URL路径问题
-    const baseUrl = app.globalData.apiBaseUrl;
-    // 移除末尾的斜杠，避免双斜杠
-    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
-    const apiUrl = cleanBaseUrl.endsWith('/api') 
-      ? `${cleanBaseUrl}/medication/reminders/`
-      : `${cleanBaseUrl}/api/medication/reminders/`;
-      
+    const token = wx.getStorageSync('token');
+    const apiUrl = 'https://wyw123.pythonanywhere.com/api/medication/reminders/';
     console.log('提交表单到API:', apiUrl);
     
     wx.request({
       url: apiUrl,
       method: 'POST',
       header: {
-        'Authorization': `Bearer ${app.globalData.token}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       data: {
@@ -210,7 +202,7 @@ Page({
         wx.hideLoading();
         if (res.statusCode === 201) {
           wx.showToast({
-            title: '药物提醒已保存',
+            title: '健康提醒已保存',
             icon: 'success'
           });
           

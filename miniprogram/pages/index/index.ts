@@ -74,25 +74,18 @@ Page({
     }
   },
   
-  // 加载药物提醒列表数据
+  // 加载健康提醒列表数据
   loadReminders() {
     this.setData({ loading: true });
     
     const token = wx.getStorageSync('token');
     if (!token) {
-      console.log('无token，跳过加载药物提醒数据');
+      console.log('无token，跳过加载健康提醒数据');
       return;
     }
     
-    // 检查apiBaseUrl是否已经包含了/api前缀
-    const baseUrl = globalApp.globalData.apiBaseUrl;
-    // 移除末尾的斜杠，避免双斜杠
-    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
-    const apiUrl = cleanBaseUrl.endsWith('/api') 
-      ? `${cleanBaseUrl}/medication/reminders/`
-      : `${cleanBaseUrl}/api/medication/reminders/`;
-      
-    console.log('请求药物提醒API：', apiUrl);
+    const apiUrl = 'https://wyw123.pythonanywhere.com/api/medication/reminders/';
+    console.log('请求健康提醒API：', apiUrl);
     
     wx.request({
       url: apiUrl,
@@ -101,16 +94,16 @@ Page({
         'Authorization': `Bearer ${token}`
       },
       success: (res: any) => {
-        console.log('获取药物提醒列表响应:', res);
+        console.log('获取健康提醒列表响应:', res);
         if (res.statusCode === 200 && res.data && Array.isArray(res.data.results)) {
-          console.log('成功获取药物提醒列表:', res.data.results);
+          console.log('成功获取健康提醒列表:', res.data.results);
           this.setData({
             reminders: res.data.results as MedicationReminder[],  // 只取results数组
             loading: false,
             error: false
           });
         } else {
-          console.error('获取药物提醒列表失败:', res);
+          console.error('获取健康提醒列表失败:', res);
           this.setData({ 
             loading: false,
             error: true,
@@ -123,7 +116,7 @@ Page({
         }
       },
       fail: (err) => {
-        console.error('请求药物提醒列表失败:', err);
+        console.error('请求健康提醒列表失败:', err);
         this.setData({ 
           loading: false,
           error: true,
@@ -183,7 +176,7 @@ Page({
     
     wx.showModal({
       title: '删除提醒',
-      content: '确定要删除这个药物提醒吗？此操作不可撤销。',
+      content: '确定要删除这个健康提醒吗？此操作不可撤销。',
       confirmText: '删除',
       confirmColor: '#f56c6c',
       success: (res) => {
@@ -201,14 +194,7 @@ Page({
     });
     
     const token = wx.getStorageSync('token');
-    
-    // 构建正确的API URL，避免路径重复
-    const baseUrl = globalApp.globalData.apiBaseUrl;
-    // 移除末尾的斜杠，避免双斜杠
-    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
-    const apiUrl = cleanBaseUrl.endsWith('/api') 
-      ? `${cleanBaseUrl}/medication/reminders/${id}/`
-      : `${cleanBaseUrl}/api/medication/reminders/${id}/`;
+    const apiUrl = `https://wyw123.pythonanywhere.com/api/medication/reminders/${id}/`;
       
     wx.request({
       url: apiUrl,
@@ -257,14 +243,7 @@ Page({
     });
     
     const token = wx.getStorageSync('token');
-    
-    // 构建正确的API URL，避免路径重复
-    const baseUrl = globalApp.globalData.apiBaseUrl;
-    // 移除末尾的斜杠，避免双斜杠
-    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
-    const apiUrl = cleanBaseUrl.endsWith('/api') 
-      ? `${cleanBaseUrl}/medication/reminders/${id}/`
-      : `${cleanBaseUrl}/api/medication/reminders/${id}/`;
+    const apiUrl = `https://wyw123.pythonanywhere.com/api/medication/reminders/${id}/`;
       
     wx.request({
       url: apiUrl,

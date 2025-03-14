@@ -1,13 +1,4 @@
 {
-  "navigationBarTitleText": "药物提醒",
-  "usingComponents": {
-    "empty-state": "/miniprogram/components/empty-state/empty-state",
-    "toast": "/miniprogram/components/toast/toast",
-    "loading-indicator": "/miniprogram/components/loading/loading"
-  },
-  "componentPlaceholder": {
-    "empty-state": "view",
-    "toast": "view",
-    "loading-indicator": "view"
-  }
+  "navigationBarTitleText": "健康提醒",
+  "usingComponents": {}
 } 

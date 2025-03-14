@@ -1,4 +1,4 @@
-// 药物提醒详情
+// 健康提醒详情
 interface MedicationReminder {
   id: number;
   name: string;
@@ -43,21 +43,15 @@ Page({
       error: false
     });
 
-    const globalApp = getApp();
-    
-    // 修复API URL路径问题
-    const baseUrl = globalApp.globalData.apiBaseUrl || globalApp.globalData.baseURL;
-    const apiUrl = baseUrl.endsWith('/api') || baseUrl.endsWith('/api/') 
-      ? `${baseUrl}/medication/reminders/${this.data.reminderId}/`
-      : `${baseUrl}/api/medication/reminders/${this.data.reminderId}/`;
-      
+    const token = wx.getStorageSync('token');
+    const apiUrl = `https://wyw123.pythonanywhere.com/api/medication/reminders/${this.data.reminderId}/`;
     console.log('请求提醒详情:', apiUrl);
     
     wx.request({
       url: apiUrl,
       method: 'GET',
       header: {
-        'Authorization': `Bearer ${globalApp.globalData.token}`
+        'Authorization': `Bearer ${token}`
       },
       success: (res: any) => {
         if (res.statusCode === 200) {
@@ -123,21 +117,15 @@ Page({
       title: newStatus ? '正在启用...' : '正在停用...'
     });
     
-    const globalApp = getApp();
-    
-    // 修复API URL路径问题
-    const baseUrl = globalApp.globalData.apiBaseUrl || globalApp.globalData.baseURL;
-    const apiUrl = baseUrl.endsWith('/api') || baseUrl.endsWith('/api/') 
-      ? `${baseUrl}/medication/reminders/${this.data.reminderId}/`
-      : `${baseUrl}/api/medication/reminders/${this.data.reminderId}/`;
-      
+    const token = wx.getStorageSync('token');
+    const apiUrl = `https://wyw123.pythonanywhere.com/api/medication/reminders/${this.data.reminderId}/`;
     console.log('更新提醒状态:', apiUrl);
     
     wx.request({
       url: apiUrl,
       method: 'PATCH' as WechatMiniprogram.RequestOption['method'],
       header: {
-        'Authorization': `Bearer ${globalApp.globalData.token}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       data: {
@@ -191,7 +179,7 @@ Page({
   deleteReminder() {
     wx.showModal({
       title: '删除提醒',
-      content: '确定要删除这个药物提醒吗？此操作不可撤销。',
+      content: '确定要删除这个健康提醒吗？此操作不可撤销。',
       confirmText: '删除',
       confirmColor: '#f44336',
       success: (res) => {
@@ -208,21 +196,15 @@ Page({
       title: '正在删除...'
     });
     
-    const globalApp = getApp();
-    
-    // 修复API URL路径问题
-    const baseUrl = globalApp.globalData.apiBaseUrl || globalApp.globalData.baseURL;
-    const apiUrl = baseUrl.endsWith('/api') || baseUrl.endsWith('/api/') 
-      ? `${baseUrl}/medication/reminders/${this.data.reminderId}/`
-      : `${baseUrl}/api/medication/reminders/${this.data.reminderId}/`;
-      
+    const token = wx.getStorageSync('token');
+    const apiUrl = `https://wyw123.pythonanywhere.com/api/medication/reminders/${this.data.reminderId}/`;
     console.log('删除提醒:', apiUrl);
     
     wx.request({
       url: apiUrl,
       method: 'DELETE',
       header: {
-        'Authorization': `Bearer ${globalApp.globalData.token}`
+        'Authorization': `Bearer ${token}`
       },
       success: (res: any) => {
         wx.hideLoading();

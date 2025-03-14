@@ -125,15 +125,13 @@ Page({
   // 测试服务器连接
   testServerConnection(): Promise<boolean> {
     return new Promise((resolve) => {
-      const app = getApp<IAppOption>();
-      const apiBaseUrl = app.globalData.apiBaseUrl;
+      const apiBaseUrl = 'https://wyw123.pythonanywhere.com/api';
       
       console.log('测试服务器连接:', apiBaseUrl);
       
       // 尝试发送一个简单的请求测试连接性
-      // 使用API根路径而不是特定端点，因为不确定后端有哪些端点
       wx.request({
-        url: 'https://wyw123.pythonanywhere.com/api/',
+        url: apiBaseUrl,
         method: 'GET',
         timeout: 10000,
         success: (res) => {
@@ -142,22 +140,7 @@ Page({
         },
         fail: (err) => {
           console.error('服务器连接测试失败:', err);
-          
-          // 尝试直接访问网站根路径
-          wx.request({
-            url: 'https://wyw123.pythonanywhere.com/',
-            method: 'GET',
-            timeout: 10000,
-            success: (res) => {
-              console.log('网站根路径访问成功:', res);
-              console.log('API路径可能不正确，但服务器是可用的');
-              resolve(true);
-            },
-            fail: (err2) => {
-              console.error('网站根路径访问失败:', err2);
-              resolve(false);
-            }
-          });
+          resolve(false);
         }
       });
     });
@@ -167,7 +150,7 @@ Page({
   showPrivacyPolicy() {
     wx.showModal({
       title: '用户协议与隐私政策',
-      content: '小艺医疗小程序尊重并保护用户隐私。我们会收集您的健康数据，仅用于为您提供健康管理服务。您的数据将被安全存储，未经您的许可，我们不会向任何第三方分享您的个人信息。',
+      content: '小艺心数日志小程序尊重并保护用户隐私。我们会收集您的健康数据，仅用于为您提供健康管理服务。您的数据将被安全存储，未经您的许可，我们不会向任何第三方分享您的个人信息。',
       showCancel: false,
       confirmText: '我知道了'
     });

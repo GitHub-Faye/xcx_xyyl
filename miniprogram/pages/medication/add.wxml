@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="page-title">添加药物提醒</view>
+  <view class="page-title">添加健康提醒</view>
   
   <view class="form-group">
     <view class="form-label">药物名称 <text class="required">*</text></view>

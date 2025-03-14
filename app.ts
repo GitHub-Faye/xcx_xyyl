@@ -1,7 +1,7 @@
 // app.ts
 App<IAppOption>({
   globalData: {
-    baseURL: 'http://localhost:8000',
+    baseURL: 'https://wyw123.pythonanywhere.com/api',
     token: '',
     userInfo: null,
     systemInfo: null,
@@ -35,6 +35,19 @@ App<IAppOption>({
     if (token) {
       this.globalData.token = token;
     }
+
+    // 确保首次启动时检查登录状态
+    wx.getStorage({
+      key: 'token',
+      success: () => {
+        console.log('找到本地token，检查有效性');
+        this.checkLoginStatusAndRedirect();
+      },
+      fail: () => {
+        console.log('本地无token，直接跳转到登录页');
+        this.redirectToLogin();
+      }
+    });
   },
   
   // 初始化组件注入功能
@@ -106,5 +119,13 @@ App<IAppOption>({
     }
     
     return 0;
+  },
+  
+  // 设置API基础URL，根据环境调整
+  setApiBaseUrl() {
+    // 直接使用线上环境
+    const apiBaseUrl = 'https://wyw123.pythonanywhere.com/api';
+    this.globalData.baseURL = apiBaseUrl;
+    console.log('使用线上API基础URL:', apiBaseUrl);
   }
 }); 

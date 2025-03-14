@@ -25,11 +25,7 @@ Page({
     wx.showLoading({ title: '加载中...' });
     
     const token = wx.getStorageSync('token');
-    const baseUrl = globalApp.globalData.apiBaseUrl;
-    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
-    const apiUrl = cleanBaseUrl.endsWith('/api') 
-      ? `${cleanBaseUrl}/medication/reminders/${this.data.reminderId}/`
-      : `${cleanBaseUrl}/api/medication/reminders/${this.data.reminderId}/`;
+    const apiUrl = `https://wyw123.pythonanywhere.com/api/medication/reminders/${this.data.reminderId}/`;
 
     wx.request({
       url: apiUrl,

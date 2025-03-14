@@ -1,6 +1,6 @@
 <view class="container {{themeVars}}">
   <view class="page-header">
-    <view class="page-title">药物提醒</view>
+    <view class="page-title">健康提醒</view>
     <view class="add-btn" bindtap="navigateToAdd">
       <text class="iconfont icon-add">+</text>
     </view>
