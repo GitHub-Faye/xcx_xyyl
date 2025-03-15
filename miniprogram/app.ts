@@ -1,7 +1,15 @@
+// 在app.ts顶部添加全局Trace函数
+// 定义全局的Trace函数，用于解决可能的引用错误
+// @ts-ignore
+globalThis.Trace = globalThis.Trace || function(...args: any[]) {
+  console.log('Trace:', ...args);
+};
+
 // app.ts
 import { checkLoginStatus } from './services/auth';
 import { request } from './utils/request';
 import { UserInfo } from './services/auth';
+import { config } from './config/env'; // 导入环境配置
 
 // Token类型定义
 interface TokenResponse {
@@ -17,6 +25,8 @@ interface IAppOption {
     refreshToken: string;
     apiBaseUrl: string;
     isLoggedIn: boolean;
+    isAnonymousMode: boolean; // 新增：匿名模式标志
+    temporaryData: Record<string, any>; // 新增：临时数据
     useMockData: boolean;  // 是否使用模拟数据
   };
   getUserInfo(): Promise<UserInfo | null>;
@@ -27,6 +37,13 @@ interface IAppOption {
   redirectToLogin(): void;
   setApiBaseUrl(): void;
   testApiEndpoints(defaultUrl: string): Promise<string | null>;
+  showLoginTips: (options?: {
+    title?: string;
+    content?: string;
+    cancelText?: string;
+    confirmText?: string;
+    success?: (result: WechatMiniprogram.ShowModalSuccessCallbackResult) => void;
+  }) => void;
 }
 
 App<IAppOption>({
@@ -34,63 +51,48 @@ App<IAppOption>({
     userInfo: null,
     token: '',
     refreshToken: '',
-    apiBaseUrl: 'http://localhost:8000/api', // 修改为本地环境
+    apiBaseUrl: config.apiBaseUrl, // 使用环境配置
     isLoggedIn: false,
+    isAnonymousMode: true, // 新增：匿名模式标志
+    temporaryData: {}, // 新增：临时数据对象
     useMockData: false
   },
   
   onLaunch() {
-    // 启动时检查登录状态
-    console.log('应用启动，开始检查登录状态');
+    // 初始化全局数据
+    this.globalData.apiBaseUrl = config.apiBaseUrl; // 使用环境配置
+    this.globalData.isLoggedIn = false;
+    this.globalData.isAnonymousMode = true; // 默认为匿名模式
+    this.globalData.temporaryData = {}; // 初始化临时数据对象
     
-    // 设置API基础URL
-    this.setApiBaseUrl();
+    // 尝试读取token
+    this.globalData.token = wx.getStorageSync('token') || '';
+    this.globalData.refreshToken = wx.getStorageSync('refreshToken') || '';
     
-    // 微信开发工具环境判断
-    const sysInfo = wx.getSystemInfoSync();
-    console.log('系统信息:', sysInfo);
-    
-    if (sysInfo.platform === 'devtools') {
-      console.log('当前是开发者工具环境，使用本地API服务');
+    if (this.globalData.token) {
+      // 检查登录状态
+      checkLoginStatus().then(isLoggedIn => {
+        console.log('登录状态检查结果:', isLoggedIn);
+        this.globalData.isLoggedIn = isLoggedIn;
+        
+        // 如果已登录，关闭匿名模式
+        if (isLoggedIn) {
+          this.globalData.isAnonymousMode = false;
+        }
+      }).catch(error => {
+        console.error('检查登录状态时出错:', error);
+        this.globalData.isLoggedIn = false;
+      });
     } else {
-      console.log('当前是真机环境，使用生产环境API服务');
+      console.log('未发现登录凭证，处于未登录状态');
+      this.globalData.isLoggedIn = false;
     }
-    
-    // 确保首次启动时检查登录状态
-    wx.getStorage({
-      key: 'token',
-      success: () => {
-        console.log('找到本地token，检查有效性');
-        this.checkLoginStatusAndRedirect();
-      },
-      fail: () => {
-        console.log('本地无token，直接跳转到登录页');
-        this.redirectToLogin();
-      }
-    });
   },
   
-  // 设置API基础URL，根据环境调整
+  // 设置API基础URL，使用环境配置
   setApiBaseUrl() {
-    const sysInfo = wx.getSystemInfoSync();
-    const isDevEnv = sysInfo.platform === 'devtools';
-    
-    // 默认使用本地环境
-    let defaultUrl = 'http://localhost:8000/api';
-    
-    // 检测服务器可用性并选择正确的路径
-    this.testApiEndpoints(defaultUrl).then((correctPath: string | null) => {
-      if (correctPath) {
-        this.globalData.apiBaseUrl = correctPath;
-        console.log('检测到的有效API基础URL:', correctPath);
-      } else {
-        // 如果检测失败，使用默认路径
-        this.globalData.apiBaseUrl = defaultUrl;
-        console.log('使用默认API基础URL:', defaultUrl);
-      }
-    });
-    
-    console.log('初始API基础URL:', this.globalData.apiBaseUrl);
+    this.globalData.apiBaseUrl = config.apiBaseUrl;
+    console.log(`使用${config.envName}API基础URL:`, this.globalData.apiBaseUrl);
   },
   
   // 测试多个可能的API端点格式
@@ -205,7 +207,7 @@ App<IAppOption>({
       if (this.globalData.isLoggedIn) {
         console.log('已登录状态下在登录页，跳转到首页');
         wx.switchTab({
-          url: '/pages/index/index'
+          url: '/pages/health-records/list'
         });
       }
     }
@@ -323,5 +325,56 @@ App<IAppOption>({
     wx.reLaunch({
       url: '/pages/auth/auth'
     });
+  },
+
+  // 新增：全局登录提示方法
+  showLoginTips(options = {}) {
+    const { 
+      title = '需要登录', 
+      content = '该功能需要登录后才能使用，是否立即登录？', 
+      cancelText = '稍后再说',
+      confirmText = '立即登录',
+      success = () => {}
+    } = options;
+    
+    wx.showModal({
+      title,
+      content,
+      cancelText,
+      confirmText,
+      success: (res) => {
+        if (res.confirm) {
+          // 记录当前页面，登录后可以返回
+          const pages = getCurrentPages();
+          if (pages.length > 0) {
+            const currentPage = pages[pages.length - 1];
+            wx.setStorageSync('loginCallbackPage', currentPage.route);
+          }
+          
+          // 跳转到登录页
+          wx.navigateTo({
+            url: '/pages/auth/auth?required=true'
+          });
+        }
+        
+        // 调用自定义回调
+        if (typeof success === 'function') {
+          success(res);
+        }
+      }
+    });
   }
 })
+
+// 声明全局类型以支持TypeScript
+declare global {
+  interface UserInfo {
+    id: number;
+    username: string;
+    nickname?: string;
+    avatar?: string;
+    // 根据实际用户信息结构添加更多字段
+  }
+}
+
+export {};

@@ -10,14 +10,6 @@
     
     <view class="notification-item">
       <view class="item-content">
-        <text class="item-title">健康提醒</text>
-        <text class="item-desc">接收测量、用药等健康提醒通知</text>
-      </view>
-      <switch checked="{{notificationSettings.healthReminders}}" bindchange="onSwitchChange" data-field="healthReminders" color="#3f51b5" />
-    </view>
-    
-    <view class="notification-item">
-      <view class="item-content">
         <text class="item-title">异常数据提醒</text>
         <text class="item-desc">当健康数据出现异常时接收提醒</text>
       </view>

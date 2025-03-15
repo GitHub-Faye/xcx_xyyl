@@ -1,4 +1,10 @@
 <view class="container">
+  <!-- 匿名模式提示 -->
+  <view class="anonymous-tip" wx:if="{{isAnonymousMode}}">
+    <icon type="info" size="16" color="#1989fa"></icon>
+    <text class="tip-text">您当前未登录，统计数据仅基于本地存储，登录后可查看更完整的数据分析</text>
+  </view>
+
   <!-- 筛选选项 -->
   <view class="filter-container">
     <view class="filter-item">

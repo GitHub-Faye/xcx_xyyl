@@ -1,4 +1,5 @@
 import { getHealthStatistics } from '../../services/healthRecords';
+import { getLocalHealthStatistics } from '../../services/localStatistics';
 const wxCharts = require('../../utils/wxcharts.js');
 
 // 获取应用实例
@@ -38,6 +39,7 @@ interface PageData {
   chartSubtitle: string;
   healthTip: string;
   loading: boolean;
+  isAnonymousMode: boolean;
 }
 
 Page({
@@ -51,22 +53,33 @@ Page({
       max: '--',
       min: '--',
       count: 0,
-      unit: ''
+      unit: '--'
     },
-    chartData: [] as ChartDataItem[],
-    chartSubtitle: '加载中...',
-    healthTip: '保持规律测量，关注健康变化趋势',
-    loading: false
+    chartData: [],
+    chartSubtitle: '最近一周趋势图',
+    healthTip: '',
+    loading: false,
+    isAnonymousMode: false
   },
 
   lineChart: null as any,
 
   onLoad() {
-    this.checkLoginAndLoadData();
+    // 检查是否为匿名模式
+    const app = getApp<IAppOption>();
+    const isAnonymousMode = !app.globalData.isLoggedIn;
+    
+    this.setData({
+      isAnonymousMode
+    });
+    
+    // 匿名模式或已登录都可以直接加载数据
+    this.loadStatisticsData();
   },
 
   onShow() {
-    this.checkLoginAndLoadData();
+    // 每次页面显示时重新加载数据
+    this.loadStatisticsData();
   },
 
   onTypeChange(e: any) {
@@ -297,7 +310,7 @@ Page({
   },
 
   async loadStatisticsData() {
-    const { periodIndex, periodOptions } = this.data;
+    const { periodIndex, periodOptions, isAnonymousMode } = this.data;
     const periodMap = ['week', 'month', 'quarter', 'all'];
     
     const type = this.getTypeKey();
@@ -309,7 +322,16 @@ Page({
     });
     
     try {
-      const result = await getHealthStatistics(type, period);
+      let result;
+      
+      // 根据登录状态决定使用本地数据还是服务器数据
+      if (isAnonymousMode) {
+        console.log('匿名模式：使用本地数据统计');
+        result = getLocalHealthStatistics(type, period);
+      } else {
+        console.log('已登录模式：使用服务器数据统计');
+        result = await getHealthStatistics(type, period);
+      }
       
       // 处理数据
       const stats: StatisticsData = {
@@ -357,16 +379,31 @@ Page({
       this.setData({
         stats,
         chartData,
-        healthTip
+        healthTip,
+        loading: false
       });
       
     } catch (error) {
-      console.error('获取健康统计数据失败:', error);
+      console.error('获取统计数据失败:', error);
       wx.showToast({
         title: '获取数据失败',
         icon: 'none'
       });
+      
+      // 设置默认数据
+      this.setData({
+        stats: {
+          average: '--',
+          max: '--',
+          min: '--',
+          count: 0,
+          unit: this.getUnitByType(this.getTypeKey())
+        },
+        chartData: [],
+        loading: false
+      });
     } finally {
+      // 无论如何都确保关闭loading状态
       this.setData({
         loading: false
       });
@@ -430,6 +467,15 @@ Page({
 
   // 检查登录状态并加载数据
   checkLoginAndLoadData() {
+    const { isAnonymousMode } = this.data;
+    
+    if (isAnonymousMode) {
+      // 匿名模式也可以加载数据，无需强制登录
+      console.log('匿名模式，继续加载本地数据');
+      this.loadStatisticsData();
+      return;
+    }
+    
     // 检查登录状态
     const token = wx.getStorageSync('token');
     console.log('统计页面获取到的token:', token);

@@ -41,11 +41,6 @@ Component({
         newActive = 1;
         console.log('[TabBar] 匹配到数据统计页面，设置active=1');
       } 
-      // 健康提醒页面
-      else if (url.includes('index/index')) {
-        newActive = 2;
-        console.log('[TabBar] 匹配到健康提醒页面，设置active=2');
-      }
       else {
         console.log('[TabBar] 未匹配到任何已知页面，保持当前激活状态');
       }

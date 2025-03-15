@@ -1,125 +1,77 @@
 <!-- 健康记录列表页 -->
 <view class="container">
-  <!-- 筛选区域 -->
-  <view class="filter-section">
-    <!-- 日期筛选和添加按钮 -->
-    <view class="date-filter-container">
+  <!-- 页面顶部添加数据按钮 -->
+  <view class="top-header">
+    <view class="page-title">健康记录</view>
+    <button class="add-data-btn" bindtap="navigateToAdd">添加数据</button>
+  </view>
+
+  <!-- 匿名模式下显示登录提示，移动到最上方，移除登录按钮 -->
+  <view class="login-tip-card" wx:if="{{isAnonymousMode}}">
+    <icon type="info" size="16" color="#1989fa"></icon>
+    <view class="login-tip-text">登录后可同步数据至云端，确保数据安全</view>
+    <button class="login-now-btn" bindtap="goToLogin">立即登录</button>
+  </view>
+
+  <view class="header">
+    <!-- 只保留日期筛选器，只在已登录模式下显示 -->
+    <view class="filters" wx:if="{{!isAnonymousMode}}">
       <view class="date-filter">
-        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
-          <view class="date-picker">
-            <text>{{startDate}}</text>
-          </view>
+        <picker mode="date" value="{{startDate}}" start="2020-01-01" end="{{today}}" bindchange="onStartDateChange">
+          <view class="date-picker">从: {{startDate}}</view>
         </picker>
-        <text class="date-separator">至</text>
-        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
-          <view class="date-picker">
-            <text>{{endDate}}</text>
-          </view>
+        <picker mode="date" value="{{endDate}}" start="{{startDate}}" end="{{today}}" bindchange="onEndDateChange">
+          <view class="date-picker">至: {{endDate}}</view>
         </picker>
-      </view>
-      
-      <!-- 添加按钮 -->
-      <view class="add-button" bindtap="navigateToAdd">
-        <text class="add-icon">+</text>
       </view>
     </view>
   </view>
   
   <!-- 记录列表 -->
-  <view class="record-list">
-    <block wx:if="{{records.length > 0}}">
-      <view class="record-item" wx:for="{{records}}" wx:key="id" bindtap="viewRecordDetail" data-id="{{item.id}}">
-        <!-- 记录图标和类型 -->
-        <view class="record-type">
-          <image class="record-icon" src="{{item.typeIcon}}" mode="aspectFit"></image>
-        </view>
-        
-        <!-- 记录内容 -->
-        <view class="record-content">
-          <!-- 记录值和时间 -->
-          <view class="record-main">
-            <!-- 血压记录 -->
-            <block wx:if="{{item.systolic_pressure && item.diastolic_pressure}}">
-              <view class="record-value">
-                <text class="value-label">血压:</text>
-                <text class="value">{{item.systolic_pressure}}/{{item.diastolic_pressure}} mmHg</text>
-                <text wx:if="{{item.heart_rate}}" class="value-extra">  心率: {{item.heart_rate}} bpm</text>
-              </view>
-            </block>
-            
-            <!-- 体重记录 -->
-            <block wx:elif="{{item.weight}}">
-              <view class="record-value">
-                <text class="value-label">体重:</text>
-                <text class="value">{{item.weight}} kg</text>
-              </view>
-            </block>
-            
-            <!-- 血糖记录 -->
-            <block wx:elif="{{item.blood_sugar}}">
-              <view class="record-value">
-                <text class="value-label">血糖:</text>
-                <text class="value">{{item.blood_sugar}} mmol/L</text>
-              </view>
-            </block>
-            
-            <!-- 体温记录 -->
-            <block wx:elif="{{item.temperature}}">
-              <view class="record-value">
-                <text class="value-label">体温:</text>
-                <text class="value">{{item.temperature}} ℃</text>
-              </view>
-            </block>
-            
-            <!-- 记录时间 -->
-            <view class="record-time">
-              <text>{{item.formattedDate}} {{item.formattedTime}}</text>
-            </view>
-          </view>
-          
-          <!-- 备注信息 -->
-          <view class="record-note" wx:if="{{item.notes}}">
-            <text>{{item.notes}}</text>
-          </view>
-        </view>
-        
-        <!-- 操作按钮 -->
-        <view class="record-actions">
-          <!-- 编辑和删除按钮 -->
-          <view class="action-button edit" catchtap="onEditRecord" data-id="{{item.id}}">
-            <image class="action-icon" src="/assets/icons/edit.png" mode="aspectFit"></image>
-          </view>
-          
-          <view class="action-button delete" catchtap="onDeleteRecord" data-id="{{item.id}}">
-            <text wx:if="{{loadingIds.includes(item.id)}}" class="loading">...</text>
-            <image wx:else class="action-icon" src="/assets/icons/delete.png" mode="aspectFit"></image>
-          </view>
+  <view class="record-list" wx:if="{{records && records.length > 0}}">
+    <view class="record-item" wx:for="{{records}}" wx:key="id" bindtap="viewRecordDetail" data-id="{{item.id}}">
+      <view class="record-icon">
+        <image src="{{item.typeIcon}}" mode="aspectFit" class="type-icon"></image>
+      </view>
+      <view class="record-content">
+        <view class="record-header">
+          <!-- 修改时间显示，使其显示完整的记录日期 -->
+          <view class="record-time">{{item.recordTimeFormatted}}</view>
         </view>
       </view>
       
-      <!-- 加载更多 -->
-      <view class="load-more" wx:if="{{hasMore && !loading}}" bindtap="loadMoreRecords">
-        <text>加载更多</text>
-      </view>
-      
-      <!-- 加载中 -->
-      <view class="loading-indicator" wx:if="{{loading}}">
-        <text>加载中...</text>
-      </view>
-      
-      <!-- 没有更多数据 -->
-      <view class="no-more" wx:if="{{!hasMore && records.length > 0 && !loading}}">
-        <text>没有更多数据</text>
-      </view>
-    </block>
-    
-    <!-- 暂无数据 -->
-    <view class="empty-state" wx:if="{{!loading && records.length === 0}}">
-      <image class="empty-icon" src="/assets/icons/empty.png" mode="aspectFit"></image>
-      <text class="empty-text">暂无健康记录</text>
-      <view class="empty-action" bindtap="navigateToAdd">
-        <text>添加记录</text>
+      <view class="record-actions">
+        <!-- 在删除按钮上添加"删除"文字 -->
+        <button class="action-btn delete-btn" style="background-color: #f44336; color: white;" catchtap="onDeleteRecord" data-id="{{item.id}}">
+          <image src="/assets/icons/delete.png" mode="aspectFit" class="action-icon"></image>
+          <text class="delete-text">删除</text>
+        </button>
       </view>
     </view>
+    
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore && !isAnonymousMode}}">
+      <button class="load-more-btn" bindtap="loadMoreRecords" loading="{{loading}}">加载更多</button>
+    </view>
+  </view>
+  
+  <!-- 无记录状态 -->
+  <view class="empty-state" wx:if="{{!loading && records.length === 0 && !isAnonymousMode}}">
+    <view class="empty-image">📋</view>
+    <view class="empty-text">您还没有添加健康记录</view>
+    <button class="btn-primary" bindtap="navigateToAdd">添加健康记录</button>
+  </view>
+  
+  <!-- 匿名模式空状态 -->
+  <view class="empty-state" wx:if="{{!loading && records.length === 0 && isAnonymousMode}}">
+    <view class="empty-image">📋</view>
+    <view class="empty-text">您还没有添加健康记录</view>
+    <button class="btn-primary" bindtap="navigateToAdd">添加健康记录</button>
+  </view>
+  
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-icon"></view>
+    <view class="loading-text">加载中...</view>
   </view>
 </view> 

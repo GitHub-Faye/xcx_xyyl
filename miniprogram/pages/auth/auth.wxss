@@ -70,6 +70,20 @@
   margin-bottom: 30rpx;
 }
 
+/* 暂不登录按钮样式，与登录按钮保持一致 */
+.skip-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  margin-bottom: 30rpx;
+  background-color: #4CAF50; /* 绿色按钮 */
+  color: #ffffff; /* 白色文字 */
+  border: none;
+}
+
 .wechat-icon {
   width: 40rpx;
   height: 40rpx;

@@ -1,12 +1,33 @@
 import { wxLogin, checkLoginStatus } from '../../services/auth';
+import { syncDataAfterLogin } from '../../services/sync';
 
 Page({
   data: {
-    loading: false
+    loading: false,
+    isOptionalLogin: true, // 新增：标记登录是可选的
+    redirectUrl: '', // 新增：登录后重定向地址
+    showFeatures: true // 显示功能介绍
   },
   
-  onLoad() {
-    this.checkAuth();
+  onLoad(options) {
+    // 检查是否有回调页面信息
+    const callbackPage = wx.getStorageSync('loginCallbackPage');
+    if (callbackPage) {
+      this.setData({
+        redirectUrl: callbackPage,
+        showFeatures: false
+      });
+    }
+    
+    // 检查是否从需要登录的功能点进入
+    if (options && options.required === 'true') {
+      this.setData({
+        isOptionalLogin: false
+      });
+    } else {
+      // 默认情况下是可选登录
+      this.checkAuth();
+    }
   },
   
   // 检查是否已经登录
@@ -14,9 +35,9 @@ Page({
     try {
       const isLoggedIn = await checkLoginStatus();
       if (isLoggedIn) {
-        // 已登录，跳转到首页
+        // 已登录，跳转到健康记录页面
         wx.switchTab({
-          url: '/pages/index/index'
+          url: '/pages/health-records/list'
         });
       }
     } catch (error) {
@@ -72,10 +93,22 @@ Page({
         icon: 'success'
       });
       
-      // 登录成功，跳转到首页
-      wx.switchTab({
-        url: '/pages/index/index'
-      });
+      // 合并临时数据（如果有）
+      await this.mergeTempData();
+      
+      // 根据来源决定跳转行为
+      setTimeout(() => {
+        if (this.data.redirectUrl) {
+          // 有指定页面则跳回该页面
+          wx.removeStorageSync('loginCallbackPage');
+          wx.navigateBack();
+        } else {
+          // 否则跳到健康记录页面
+          wx.switchTab({
+            url: '/pages/health-records/list'
+          });
+        }
+      }, 1500);
     } catch (error) {
       console.error('登录失败', error);
       
@@ -125,7 +158,7 @@ Page({
   // 测试服务器连接
   testServerConnection(): Promise<boolean> {
     return new Promise((resolve) => {
-      const apiBaseUrl = 'https://wyw123.pythonanywhere.com/api';
+      const apiBaseUrl = 'http://localhost:8000/api'; // 修改为本地环境URL
       
       console.log('测试服务器连接:', apiBaseUrl);
       
@@ -154,5 +187,55 @@ Page({
       showCancel: false,
       confirmText: '我知道了'
     });
+  },
+  
+  // 新增：跳过登录，返回上一页或进入健康记录页面
+  skipLogin() {
+    if (this.data.redirectUrl) {
+      // 如果是从某个页面跳转过来的，返回该页面
+      wx.navigateBack();
+    } else {
+      // 否则直接进入健康记录页面
+      wx.switchTab({
+        url: '/pages/health-records/list'
+      });
+    }
+  },
+  
+  // 新增：合并临时数据方法
+  async mergeTempData() {
+    try {
+      console.log('开始合并临时数据...');
+      
+      // 检查本地是否有临时数据
+      const tempRecords = wx.getStorageSync('tempHealthRecords') || [];
+      console.log('本地临时健康记录数:', Array.isArray(tempRecords) ? tempRecords.length : '非数组');
+      
+      // 使用同步服务同步所有临时数据
+      const syncResult = await syncDataAfterLogin();
+      console.log('同步临时数据结果:', syncResult);
+      
+      if (syncResult && syncResult.success) {
+        // 同步健康记录
+        if (syncResult.result && syncResult.result.healthRecords && syncResult.result.healthRecords.syncedCount > 0) {
+          console.log(`成功同步${syncResult.result.healthRecords.syncedCount}条健康记录`);
+          
+          // 手动清理本地数据
+          wx.setStorageSync('tempHealthRecords', []);
+          console.log('已清理本地临时健康记录');
+          
+          wx.showToast({
+            title: `成功同步${syncResult.result.healthRecords.syncedCount}条记录`,
+            icon: 'success'
+          });
+        } else {
+          console.log('没有需要同步的健康记录');
+        }
+      } else {
+        console.error('同步临时数据失败:', syncResult ? (syncResult.error || syncResult.reason) : '未知错误');
+      }
+    } catch (error) {
+      console.error('合并临时数据时出错:', error);
+    }
   }
 }); 

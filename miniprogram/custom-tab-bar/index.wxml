@@ -20,15 +20,4 @@
     </view>
     <view class="tab-label">数据统计</view>
   </view>
-  
-  <!-- 健康提醒 -->
-  <view class="tab-bar-item {{active === 2 ? 'active' : ''}}" 
-        bindtap="switchTab" 
-        data-index="2" 
-        data-path="/pages/index/index">
-    <view class="icon-wrapper">
-      <view class="icon icon-reminder {{active === 2 ? 'active-icon' : ''}}"></view>
-    </view>
-    <view class="tab-label">健康提醒</view>
-  </view>
 </view> 

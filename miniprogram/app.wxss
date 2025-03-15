@@ -91,6 +91,12 @@ page {
   color: #ffffff;
 }
 
+.btn-default {
+  background-color: #f5f5f5;
+  color: #666666;
+  border: 1px solid #dddddd;
+}
+
 /* 其他通用样式 */
 .text-center {
   text-align: center;
@@ -133,4 +139,40 @@ page {
 .stat-label {
   font-size: 12px;
   color: var(--light-text-color);
-} 
+}
+
+/* 登录页样式 */
+.skip-btn {
+  margin-top: 20rpx;
+}
+
+/* 登录提示卡片 */
+.login-tip-card {
+  margin: 20rpx;
+  padding: 20rpx;
+  background-color: #e6f7ff;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+}
+
+.login-tip-text {
+  font-size: 24rpx;
+  color: #1989fa;
+  margin-left: 10rpx;
+  flex: 1;
+}
+
+.login-now-btn {
+  padding: 0 30rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  font-size: 24rpx;
+  border-radius: 30rpx;
+  background-color: #1989fa;
+  color: #fff;
+  margin: 0;
+}
+
+/* 共享UI组件样式 */
+/* ... existing code ... */

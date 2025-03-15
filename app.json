@@ -1,17 +1,11 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/auth/auth",
     "pages/health-records/list",
+    "pages/auth/auth",
     "pages/health-records/add",
     "pages/health-records/edit",
     "pages/health-records/detail",
     "pages/health-statistics/index",
-    "pages/health-reminders/index",
-    "pages/health-reminders/add",
-    "pages/health-reminders/edit",
-    "pages/medication/list",
-    "pages/medication/add",
     "pages/settings/personal/personal",
     "pages/settings/privacy/privacy",
     "pages/settings/notification/notification",
@@ -37,10 +31,6 @@
       {
         "pagePath": "pages/health-statistics/index",
         "text": "数据统计"
-      },
-      {
-        "pagePath": "pages/index/index",
-        "text": "健康提醒"
       }
     ]
   },

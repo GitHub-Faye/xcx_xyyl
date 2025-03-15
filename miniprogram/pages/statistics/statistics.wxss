@@ -1,7 +1,25 @@
-  .container {
+/* 页面容器 */
+.container {
   min-height: 100vh;
+  background-color: #f5f7fa;
   padding: 30rpx;
-  background-color: #f7f9fc;
+}
+
+/* 匿名模式提示样式 */
+.anonymous-tip {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #e6f7ff;
+  border-radius: 8rpx;
+  margin-bottom: 20rpx;
+}
+
+.anonymous-tip .tip-text {
+  font-size: 24rpx;
+  color: #1989fa;
+  margin-left: 10rpx;
+  flex: 1;
 }
 
 /* 筛选器样式 */

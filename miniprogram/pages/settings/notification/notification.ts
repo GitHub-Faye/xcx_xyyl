@@ -1,8 +1,7 @@
-import { updateNotificationSettings, getNotificationSettings } from '../../../../services/user';
+import { updateNotificationSettings, getNotificationSettings } from '../../../services/user';
 
 // 通知设置接口
 interface NotificationSettings {
-  healthReminders: boolean;
   abnormalDataAlerts: boolean;
   healthReports: boolean;
   newsAndActivities: boolean;
@@ -17,7 +16,6 @@ interface NotificationSettings {
 Page({
   data: {
     notificationSettings: {
-      healthReminders: true,
       abnormalDataAlerts: true,
       healthReports: true,
       newsAndActivities: false,
@@ -47,6 +45,12 @@ Page({
       const storedSettings = wx.getStorageSync('notificationSettings');
       
       if (storedSettings) {
+        // 处理可能存在的旧字段
+        if ('healthReminders' in storedSettings) {
+          // 删除旧字段
+          delete storedSettings.healthReminders;
+        }
+        
         this.setData({
           notificationSettings: storedSettings
         });

@@ -1,11 +1,7 @@
 {
   "pages": [
-    "pages/auth/auth",
-    "pages/index/index",
-    "pages/medication/add",
-    "pages/medication/edit",
-    "pages/medication/detail",
     "pages/health-records/list",
+    "pages/auth/auth",
     "pages/health-records/edit",
     "pages/statistics/statistics",
     "pages/api-test/api-test",
@@ -31,10 +27,6 @@
       {
         "pagePath": "pages/statistics/statistics",
         "text": "数据统计"
-      },
-      {
-        "pagePath": "pages/index/index",
-        "text": "健康提醒"
       }
     ]
   },

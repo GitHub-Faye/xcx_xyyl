@@ -354,4 +354,245 @@ function getMockHealthRecords(params: HealthRecordQueryParams = {}): HealthRecor
     pageSize: pageSize || result.length,
     hasMore: result.length < records.length
   };
+}
+
+/**
+ * 添加本地健康记录（匿名模式）
+ * @param data 健康记录数据
+ * @returns 添加后的健康记录
+ */
+export function addLocalHealthRecord(data: Partial<HealthRecord>): HealthRecord {
+  try {
+    // 获取现有记录
+    let records = wx.getStorageSync('tempHealthRecords') || [];
+    
+    // 构造记录对象
+    const now = new Date();
+    const record: HealthRecord = {
+      id: `temp_${now.getTime()}`,
+      userId: 'anonymous',
+      measureTime: data.measureTime || now.toISOString(),
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+      ...data
+    };
+    
+    // 添加到本地存储
+    records.push(record);
+    wx.setStorageSync('tempHealthRecords', records);
+    
+    console.log('添加本地健康记录成功:', record);
+    return record;
+  } catch (error) {
+    console.error('添加本地健康记录失败:', error);
+    throw error;
+  }
+}
+
+/**
+ * 获取本地健康记录列表（匿名模式）
+ * @param params 查询参数
+ * @returns 健康记录响应
+ */
+export function getLocalHealthRecords(params: HealthRecordQueryParams = {}): HealthRecordResponse {
+  try {
+    // 获取记录
+    let records = wx.getStorageSync('tempHealthRecords') || [];
+    console.log('本地原始记录:', records);
+    
+    // 根据类型筛选
+    if (params.type && params.type !== 'all') {
+      records = records.filter((record: any) => {
+        if (params.type === 'bloodPressure' && 
+           (record.systolicPressure || record.systolic_pressure) && 
+           (record.diastolicPressure || record.diastolic_pressure)) return true;
+        if (params.type === 'bloodSugar' && (record.bloodSugar || record.blood_sugar)) return true;
+        if (params.type === 'weight' && record.weight) return true;
+        if (params.type === 'heartRate' && (record.heartRate || record.heart_rate)) return true;
+        return false;
+      });
+    }
+    
+    // 根据日期范围筛选
+    if (params.startDate || params.endDate) {
+      records = records.filter((record: any) => {
+        // 兼容多种时间字段命名
+        const recordTime = new Date(record.measureTime || record.record_time || record.recordDate).getTime();
+        let match = true;
+        
+        if (params.startDate) {
+          const startTime = new Date(params.startDate).getTime();
+          match = match && recordTime >= startTime;
+        }
+        
+        if (params.endDate) {
+          const endTime = new Date(params.endDate).getTime() + 24 * 60 * 60 * 1000 - 1; // 截至到当天的23:59:59
+          match = match && recordTime <= endTime;
+        }
+        
+        return match;
+      });
+    }
+    
+    // 排序
+    const sortOrder = params.order === 'asc' ? 1 : -1;
+    const sortBy = params.sortBy || 'measureTime';
+    
+    records.sort((a: any, b: any) => {
+      // 兼容多种时间字段命名
+      const timeA = new Date(a.measureTime || a.record_time || a.recordDate).getTime();
+      const timeB = new Date(b.measureTime || b.record_time || b.recordDate).getTime();
+      return sortOrder * (timeA - timeB);
+    });
+    
+    // 分页
+    const page = params.page || 1;
+    const pageSize = params.pageSize || 10;
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const pagedRecords = records.slice(start, end);
+    
+    // 标准化记录，以兼容不同字段名
+    const standardizedRecords = pagedRecords.map((record: any) => {
+      // 确保日期字段被正确处理
+      const measureTime = record.measureTime || record.record_time || record.recordDate;
+      
+      // 如果是纯日期格式(YYYY-MM-DD)，转换为ISO日期时间格式
+      let formattedMeasureTime = measureTime;
+      if (measureTime && /^\d{4}-\d{2}-\d{2}$/.test(measureTime)) {
+        // 转换为当天的中午12点，避免时区问题
+        formattedMeasureTime = `${measureTime}T12:00:00.000Z`;
+      }
+      
+      return {
+        id: record.id,
+        userId: record.userId || 'anonymous',
+        measureTime: formattedMeasureTime,
+        recordDate: record.recordDate, // 保留原始的recordDate字段
+        createdAt: record.createdAt || record.created_at || new Date().toISOString(),
+        updatedAt: record.updatedAt || record.updated_at || new Date().toISOString(),
+        note: record.note,
+        
+        // 血压相关字段
+        systolicPressure: record.systolicPressure || record.systolic_pressure,
+        diastolicPressure: record.diastolicPressure || record.diastolic_pressure,
+        heartRate: record.heartRate || record.heart_rate,
+        
+        // 血糖相关字段
+        bloodSugar: record.bloodSugar || record.blood_sugar,
+        measurePeriod: record.measurePeriod,
+        
+        // 体重相关字段
+        weight: record.weight,
+        height: record.height,
+        bmi: record.bmi,
+        
+        // 体温相关字段
+        temperature: record.temperature,
+      };
+    });
+    
+    return {
+      records: standardizedRecords,
+      total: records.length,
+      page,
+      pageSize,
+      hasMore: end < records.length
+    };
+  } catch (error) {
+    console.error('获取本地健康记录失败:', error);
+    return {
+      records: [],
+      total: 0,
+      page: 1,
+      pageSize: 10,
+      hasMore: false
+    };
+  }
+}
+
+/**
+ * 删除本地健康记录（匿名模式）
+ * @param id 记录ID
+ */
+export function deleteLocalHealthRecord(id: string): void {
+  try {
+    // 获取现有记录
+    let records = wx.getStorageSync('tempHealthRecords') || [];
+    
+    // 过滤掉要删除的记录
+    records = records.filter((record: HealthRecord) => record.id !== id);
+    
+    // 保存回本地存储
+    wx.setStorageSync('tempHealthRecords', records);
+    
+    console.log('删除本地健康记录成功:', id);
+  } catch (error) {
+    console.error('删除本地健康记录失败:', error);
+    throw error;
+  }
+}
+
+/**
+ * 获取本地健康记录详情（匿名模式）
+ * @param id 记录ID
+ * @returns 健康记录详情
+ */
+export function getLocalHealthRecordDetail(id: string): HealthRecord | null {
+  try {
+    // 获取现有记录
+    const records = wx.getStorageSync('tempHealthRecords') || [];
+    
+    // 查找指定ID的记录
+    const record = records.find((r: HealthRecord) => r.id === id);
+    
+    if (!record) {
+      console.warn('未找到本地健康记录:', id);
+      return null;
+    }
+    
+    return record;
+  } catch (error) {
+    console.error('获取本地健康记录详情失败:', error);
+    return null;
+  }
+}
+
+/**
+ * 更新本地健康记录（匿名模式）
+ * @param id 记录ID
+ * @param data 更新数据
+ * @returns 更新后的健康记录
+ */
+export function updateLocalHealthRecord(id: string, data: Partial<HealthRecord>): HealthRecord | null {
+  try {
+    // 获取现有记录
+    let records = wx.getStorageSync('tempHealthRecords') || [];
+    
+    // 查找指定ID的记录索引
+    const index = records.findIndex((r: HealthRecord) => r.id === id);
+    
+    if (index === -1) {
+      console.warn('未找到要更新的本地健康记录:', id);
+      return null;
+    }
+    
+    // 更新记录
+    const updatedRecord: HealthRecord = {
+      ...records[index],
+      ...data,
+      updatedAt: new Date().toISOString()
+    };
+    
+    records[index] = updatedRecord;
+    
+    // 保存回本地存储
+    wx.setStorageSync('tempHealthRecords', records);
+    
+    console.log('更新本地健康记录成功:', updatedRecord);
+    return updatedRecord;
+  } catch (error) {
+    console.error('更新本地健康记录失败:', error);
+    return null;
+  }
 } 

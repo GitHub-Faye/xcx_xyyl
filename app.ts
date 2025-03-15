@@ -7,7 +7,11 @@ App<IAppOption>({
     systemInfo: null,
     // 组件注入相关配置
     injectComponents: true,
-    themeMode: 'light'
+    themeMode: 'light',
+    // 添加匿名模式标志
+    isAnonymousMode: true,
+    // 临时存储数据
+    temporaryData: {}
   },
 
   onLaunch() {
@@ -29,25 +33,79 @@ App<IAppOption>({
 
     // 初始化组件注入
     this.initComponentInjection();
+    
+    // 清理旧的提醒数据
+    this.cleanupReminderData();
 
-    // 从本地缓存获取用户令牌
+    // 从本地缓存获取用户令牌但不强制登录
     const token = wx.getStorageSync('token');
     if (token) {
       this.globalData.token = token;
+      // 静默检查登录状态，不影响用户体验
+      this.silentCheckLoginStatus();
+    } else {
+      console.log('本地无token，启用匿名模式');
+      this.globalData.isAnonymousMode = true;
     }
-
-    // 确保首次启动时检查登录状态
-    wx.getStorage({
-      key: 'token',
-      success: () => {
-        console.log('找到本地token，检查有效性');
-        this.checkLoginStatusAndRedirect();
-      },
-      fail: () => {
-        console.log('本地无token，直接跳转到登录页');
-        this.redirectToLogin();
+  },
+  
+  // 清理所有提醒相关的本地存储数据
+  cleanupReminderData() {
+    try {
+      console.log('清理本地提醒数据...');
+      const reminderStorageKeys = [
+        'local_health_reminders',
+        'temp_medication_reminders',
+        'unified_health_reminders'
+      ];
+      
+      reminderStorageKeys.forEach(key => {
+        try {
+          if (wx.getStorageSync(key)) {
+            wx.removeStorageSync(key);
+            console.log(`已清理本地存储: ${key}`);
+          }
+        } catch (err) {
+          console.error(`清理本地存储 ${key} 时出错:`, err);
+        }
+      });
+      
+      console.log('本地提醒数据清理完成');
+    } catch (error) {
+      console.error('清理本地提醒数据失败:', error);
+    }
+  },
+  
+  // 新增：静默检查登录状态，不跳转
+  async silentCheckLoginStatus() {
+    try {
+      const token = wx.getStorageSync('token');
+      if (!token) {
+        this.globalData.isAnonymousMode = true;
+        return;
       }
-    });
+      
+      // 使用token，但不强制跳转
+      this.globalData.token = token;
+      console.log('发现本地token，检查有效性');
+      
+      // 执行登录检查，但不强制跳转
+      checkLoginStatus().then(isLoggedIn => {
+        console.log('登录状态检查结果：', isLoggedIn ? '已登录' : '未登录');
+        this.globalData.isAnonymousMode = !isLoggedIn;
+        
+        if (isLoggedIn) {
+          // 更新全局状态但不跳转
+          this.getUserInfo();
+        }
+      }).catch(err => {
+        console.error('登录检查失败:', err);
+        this.globalData.isAnonymousMode = true;
+      });
+    } catch (error) {
+      console.error('静默检查登录状态出错', error);
+      this.globalData.isAnonymousMode = true;
+    }
   },
   
   // 初始化组件注入功能
@@ -119,6 +177,48 @@ App<IAppOption>({
     }
     
     return 0;
+  },
+  
+  // 修改：不再强制跳转到登录页
+  checkLoginStatusAndRedirect() {
+    // 移除强制跳转逻辑，允许未登录状态下使用
+    this.silentCheckLoginStatus();
+  },
+  
+  // 重定向到登录页
+  redirectToLogin() {
+    // 修改为不再强制跳转到登录页
+    console.log('登录验证失败，但不强制跳转');
+    this.globalData.isAnonymousMode = true;
+  },
+  
+  // 新增：当用户触发需要登录的功能时调用
+  showLoginTips(requiredFeature: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      wx.showModal({
+        title: '需要登录',
+        content: `"${requiredFeature}"功能需要登录后才能使用，是否现在登录？`,
+        confirmText: '去登录',
+        cancelText: '暂不登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/auth/auth',
+              success: () => {
+                // 传递回调信息，以便登录成功后返回当前页面
+                const currentPages = getCurrentPages();
+                const currentPage = currentPages[currentPages.length - 1];
+                const currentRoute = currentPage.route;
+                wx.setStorageSync('loginCallbackPage', currentRoute);
+              }
+            });
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }
+      });
+    });
   },
   
   // 设置API基础URL，根据环境调整

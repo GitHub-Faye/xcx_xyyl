@@ -7,12 +7,16 @@
   
   <view class="auth-container">
     <view class="card">
-      <view class="title">微信登录</view>
+      <view class="title">{{isOptionalLogin ? '微信登录 (可选)' : '微信登录'}}</view>
       <view class="auth-description">使用微信账号登录，轻松管理您的健康数据</view>
       
-      <button class="btn btn-primary login-btn" bindtap="handleLogin">
+      <button class="btn btn-primary login-btn" bindtap="handleLogin" loading="{{loading}}">
         <image class="wechat-icon" src="/images/wechat.png" mode="aspectFit"></image>
         微信一键登录
+      </button>
+      
+      <button wx:if="{{isOptionalLogin}}" class="btn skip-btn" bindtap="skipLogin">
+        暂不登录，继续使用
       </button>
       
       <view class="privacy-policy">
@@ -21,7 +25,7 @@
       </view>
     </view>
     
-    <view class="app-features">
+    <view class="app-features" wx:if="{{showFeatures}}">
       <view class="feature-item">
         <image class="feature-icon" src="/images/feature-record.png" mode="aspectFit"></image>
         <text class="feature-text">健康数据记录</text>

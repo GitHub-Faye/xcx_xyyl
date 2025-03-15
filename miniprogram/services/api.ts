@@ -1,5 +1,8 @@
 // API请求服务
-const app = getApp<IAppOption>();
+// 移除顶级作用域的 app 声明，在运行时获取
+// const app = getApp<IAppOption>();
+
+import { config } from '../config/env'; // 导入环境配置
 
 type RequestOptions = {
   url: string;
@@ -17,24 +20,39 @@ let isRefreshing = false;
  * 封装的网络请求方法
  */
 export const request = async <T = any>(options: RequestOptions): Promise<T> => {
+  // 在函数内部获取 app 实例
+  const app = getApp<IAppOption>();
+  
   const { url, method = 'GET', data, needAuth = true } = options;
   const header: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.header
   };
 
-  // 如果需要认证，添加token到请求头
-  if (needAuth && app.globalData.token) {
+  // 如果需要认证，添加token到请求头（添加安全检查）
+  if (needAuth && app && app.globalData && app.globalData.token) {
     header['Authorization'] = `Bearer ${app.globalData.token}`;
   }
 
   try {
     const res = await new Promise<WechatMiniprogram.RequestSuccessCallbackResult>((resolve, reject) => {
+      // 使用环境配置的API基础URL，并处理URL拼接
+      let apiUrl: string;
+      if (url.startsWith('http')) {
+        apiUrl = url;
+      } else {
+        // 确保不会出现双斜杠问题
+        const baseUrl = config.apiBaseUrl.endsWith('/') ? config.apiBaseUrl.slice(0, -1) : config.apiBaseUrl;
+        const apiPath = url.startsWith('/') ? url : `/${url}`;
+        apiUrl = `${baseUrl}${apiPath}`;
+      }
+      
       wx.request({
-        url: url.startsWith('http') ? url : `${app.globalData.apiBaseUrl}${url}`,
+        url: apiUrl,
         method,
         data,
         header,
+        timeout: config.timeout, // 使用环境配置的超时时间
         success: resolve,
         fail: reject
       });
@@ -75,14 +93,15 @@ export const request = async <T = any>(options: RequestOptions): Promise<T> => {
  * 处理Token刷新
  */
 async function handleTokenRefresh<T>(originalRequest: RequestOptions): Promise<T> {
+  // 在函数内部获取app实例
+  const app = getApp<IAppOption>();
+  
   // 如果已经在刷新中，则将请求加入队列
   if (isRefreshing) {
     return new Promise((resolve, reject) => {
-      requestQueue.push(() => 
-        request<T>(originalRequest)
-          .then(resolve)
-          .catch(reject)
-      );
+      request<T>(originalRequest)
+        .then(resolve)
+        .catch(reject);
     });
   }
 

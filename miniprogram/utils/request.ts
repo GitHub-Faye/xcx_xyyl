@@ -24,7 +24,7 @@ export interface RequestError extends Error {
 export function request<T>(options: RequestOptions): Promise<T> {
   return new Promise((resolve, reject) => {
     const app = getApp<IAppOption>();
-    const BASE_URL = 'https://wyw123.pythonanywhere.com/api';
+    const BASE_URL = app && app.globalData ? app.globalData.apiBaseUrl : 'http://localhost:8000/api';
     
     // 获取token
     const token = wx.getStorageSync('token') || '';
