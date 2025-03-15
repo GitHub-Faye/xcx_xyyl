@@ -362,80 +362,48 @@ Page({
     app.redirectToLogin();
   },
 
-  // 格式化记录的方法
+  // 格式化记录数据，添加UI显示所需的附加字段
   formatRecords(records: any[]): ExtendedHealthRecord[] {
-    console.log('开始格式化记录:', records);
     return records.map(record => {
-      // 处理不同的日期字段，优先使用recordDate
+      // 获取记录时间
       const measureTime = record.recordDate || record.measureTime || record.record_time;
       if (!measureTime) {
-        console.warn('记录缺少时间字段:', record);
+        console.warn('记录缺少时间信息:', record);
       }
       
+      // 创建日期对象
       const dateObj = new Date(measureTime || new Date());
       
-      // 格式化日期和时间
-      const year = dateObj.getFullYear();
-      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-      const day = dateObj.getDate().toString().padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-      
-      const hours = dateObj.getHours().toString().padStart(2, '0');
-      const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-      const formattedTime = `${hours}:${minutes}`;
+      // 格式化日期，只显示日期部分
+      const formattedDate = this.formatDate(dateObj);
       
       // 确定记录类型和图标
-      let recordType = 'unknown';
+      let typeIcon = '';
+      let typeName = '';
       
-      // 支持两种字段命名方式（API和Service）
-      if ((record.systolicPressure && record.diastolicPressure) || 
-          (record.systolic_pressure && record.diastolic_pressure)) {
-        recordType = 'bloodPressure';
-      } else if (record.bloodSugar !== undefined || record.blood_sugar !== undefined) {
-        recordType = 'bloodSugar';
-      } else if (record.weight !== undefined) {
-        recordType = 'weight';
-      } else if (record.temperature !== undefined) {
-        recordType = 'temperature';
-      }
-      
-      // 记录没有预期字段，尝试打印以便调试
-      if (recordType === 'unknown') {
-        console.warn('无法确定记录类型:', record);
-      }
-      
-      // 安全访问typeIcons
-      const typeIcon = recordType && this.data.typeIcons && this.data.typeIcons[recordType as keyof typeof this.data.typeIcons]
-        ? this.data.typeIcons[recordType as keyof typeof this.data.typeIcons]
-        : '/assets/icons/default.png';
-      
-      // 根据是否有recordDate决定如何格式化显示时间
-      let recordTimeFormatted;
-      if (record.recordDate) {
-        // 只显示日期，不显示时间
-        recordTimeFormatted = record.recordDate;
-      } else {
-        // 如果没有recordDate，则使用完整的日期时间格式
-        recordTimeFormatted = `${formattedDate} ${formattedTime}`;
+      if (record.systolic_pressure || record.diastolic_pressure) {
+        typeIcon = this.data.typeIcons.bloodPressure;
+        typeName = this.data.typeNames.bloodPressure;
+      } else if (record.blood_sugar) {
+        typeIcon = this.data.typeIcons.bloodSugar;
+        typeName = this.data.typeNames.bloodSugar;
+      } else if (record.weight) {
+        typeIcon = this.data.typeIcons.weight;
+        typeName = this.data.typeNames.weight;
       }
       
       return {
         ...record,
-        recordTimeFormatted,
-        formattedDate,
-        formattedTime,
         typeIcon,
-        typeName: this.getTypeName(recordType)
+        typeName,
+        recordTimeFormatted: formattedDate  // 只显示日期
       };
     });
   },
-
+  
   // 格式化日期
   formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   },
 
   // 日期范围选择 - 开始日期

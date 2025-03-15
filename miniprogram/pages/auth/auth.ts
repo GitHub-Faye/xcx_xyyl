@@ -1,5 +1,6 @@
 import { wxLogin, checkLoginStatus } from '../../services/auth';
 import { syncDataAfterLogin } from '../../services/sync';
+import { config } from '../../config/env';
 
 Page({
   data: {
@@ -158,7 +159,7 @@ Page({
   // 测试服务器连接
   testServerConnection(): Promise<boolean> {
     return new Promise((resolve) => {
-      const apiBaseUrl = 'http://localhost:8000/api'; // 修改为本地环境URL
+      const { apiBaseUrl } = config;
       
       console.log('测试服务器连接:', apiBaseUrl);
       

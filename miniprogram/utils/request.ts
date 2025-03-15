@@ -1,3 +1,5 @@
+import { config } from '../config/env';
+
 // 请求配置接口
 export interface RequestOptions {
   url: string;
@@ -15,16 +17,11 @@ export interface RequestError extends Error {
   data?: any;
 }
 
-// 基础URL
-// 不再硬编码BASE_URL，而是从app中获取
-// const BASE_URL = 'http://localhost:8000/api'; // 本地开发环境
-// const BASE_URL = 'https://your-api-domain.com/api'; // 生产环境
-
 // 请求函数
 export function request<T>(options: RequestOptions): Promise<T> {
   return new Promise((resolve, reject) => {
-    const app = getApp<IAppOption>();
-    const BASE_URL = app && app.globalData ? app.globalData.apiBaseUrl : 'http://localhost:8000/api';
+    // 直接使用环境配置中的 apiBaseUrl
+    const BASE_URL = config.apiBaseUrl;
     
     // 获取token
     const token = wx.getStorageSync('token') || '';

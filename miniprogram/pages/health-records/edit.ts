@@ -281,10 +281,6 @@ Page({
       // 准备记录数据
       const { record } = this.data;
       
-      // 构建ISO 8601格式的日期时间字符串
-      const now = new Date();
-      const record_time = now.toISOString();
-      
       if (this.data.isAnonymousMode) {
         // 匿名模式，保存到本地
         this.saveToLocalStorage(record);
@@ -292,7 +288,8 @@ Page({
         // 已登录模式，保存到服务器
         const healthRecord: HealthRecord = {
           id: this.data.isEdit ? this.data.recordId : undefined,
-          record_time: record_time
+          // 使用用户选择的日期，添加时间部分
+          record_time: `${record.recordDate}T00:00:00.000Z`
         };
         
         // 添加所有填写的健康指标，确保数值格式正确
@@ -369,7 +366,7 @@ Page({
       // 添加记录时间和更新时间
       recordDate: formRecord.recordDate, // 显式保存recordDate用于显示
       measureTime: formRecord.recordDate, // 健康记录服务使用的字段
-      record_time: now.toISOString(), // API使用的字段
+      record_time: formRecord.recordDate ? `${formRecord.recordDate}T00:00:00.000Z` : now.toISOString(), // API使用的字段，只有在没有选择日期时才使用当前时间
       updated_at: now.toISOString()
     };
     

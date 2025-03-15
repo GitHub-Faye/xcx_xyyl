@@ -27,11 +27,27 @@ export const syncTempHealthRecords = async (records: any[]) => {
       // 移除临时数据特有的字段
       const { id, ...recordData } = record;
       
+      // 获取记录时间，优先使用原始记录的时间
+      let recordTime = record.record_time;
+      if (!recordTime) {
+        // 如果没有 record_time，尝试其他时间字段
+        if (record.measureTime) {
+          recordTime = record.measureTime;
+        } else if (record.recordDate) {
+          // 如果是日期格式，确保添加时间部分
+          recordTime = `${record.recordDate}T00:00:00.000Z`;
+        }
+      }
+      
+      if (!recordTime) {
+        console.warn('记录缺少时间信息，使用当前时间:', record);
+        recordTime = new Date().toISOString();
+      }
+      
       // 构造API所需的记录格式
       const apiRecord: any = {
         ...recordData,
-        // 确保日期时间字段存在
-        record_time: record.record_time || record.measureTime || record.recordDate || new Date().toISOString()
+        record_time: recordTime
       };
       
       // 处理字段名格式差异（API使用蛇形命名，本地使用驼峰命名）

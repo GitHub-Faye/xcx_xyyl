@@ -98,16 +98,32 @@ export async function getHealthRecordDetail(id: string): Promise<HealthRecord> {
 // 创建健康记录
 export async function createHealthRecord(data: Partial<HealthRecord>): Promise<HealthRecord> {
   // 转换字段名称以匹配后端API
-  const apiData: any = {
-    record_time: data.measureTime
-  };
+  const apiData: any = {};
   
-  if (data.systolicPressure) apiData.systolic_pressure = data.systolicPressure;
-  if (data.diastolicPressure) apiData.diastolic_pressure = data.diastolicPressure;
-  if (data.heartRate) apiData.heart_rate = data.heartRate;
-  if (data.bloodSugar) apiData.blood_sugar = data.bloodSugar;
-  if (data.weight) apiData.weight = data.weight;
-  if (data.note) apiData.note = data.note;
+  // 确保使用正确的记录时间
+  if (data.measureTime) {
+    // 如果是纯日期格式（YYYY-MM-DD），保持用户选择的日期，时间设置为当天的00:00:00
+    if (data.measureTime.length === 10) { // YYYY-MM-DD 格式
+      apiData.record_time = `${data.measureTime}T00:00:00.000Z`;
+    } else {
+      // 如果已经是完整的日期时间格式，直接使用
+      apiData.record_time = data.measureTime;
+    }
+  } else {
+    // 只有在用户没有提供时间时，才使用当前时间
+    console.warn('未提供测量时间，使用当前时间');
+    apiData.record_time = new Date().toISOString();
+  }
+  
+  // 转换其他字段
+  if (data.systolicPressure !== undefined) apiData.systolic_pressure = data.systolicPressure;
+  if (data.diastolicPressure !== undefined) apiData.diastolic_pressure = data.diastolicPressure;
+  if (data.heartRate !== undefined) apiData.heart_rate = data.heartRate;
+  if (data.bloodSugar !== undefined) apiData.blood_sugar = data.bloodSugar;
+  if (data.weight !== undefined) apiData.weight = data.weight;
+  if (data.note !== undefined) apiData.note = data.note;
+  
+  console.log('创建健康记录，发送数据:', apiData);
   
   return request<HealthRecord>({
     url: '/health-records/',
@@ -368,13 +384,23 @@ export function addLocalHealthRecord(data: Partial<HealthRecord>): HealthRecord 
     
     // 构造记录对象
     const now = new Date();
+    
+    // 处理测量时间
+    let measureTime = data.measureTime;
+    if (!measureTime) {
+      console.warn('未提供测量时间，使用当前时间');
+      measureTime = now.toISOString();
+    } else if (measureTime.length === 10) { // YYYY-MM-DD 格式
+      measureTime = `${measureTime}T00:00:00.000Z`;
+    }
+    
     const record: HealthRecord = {
+      ...data,  // 先展开用户数据
       id: `temp_${now.getTime()}`,
       userId: 'anonymous',
-      measureTime: data.measureTime || now.toISOString(),
+      measureTime: measureTime,  // 使用处理后的测量时间
       createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-      ...data
+      updatedAt: now.toISOString()
     };
     
     // 添加到本地存储

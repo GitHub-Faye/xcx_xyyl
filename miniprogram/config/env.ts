@@ -1,5 +1,5 @@
-// 环境配置文件 - 只需修改这一行来切换环境
-export const CURRENT_ENV = 'development'; // 改为 'production' 即可切换到生产环境
+// 环境配置文件
+export const CURRENT_ENV = 'production' as const; // 使用 as const 来确保类型推断
 
 // 环境类型
 export enum EnvType {
@@ -22,8 +22,8 @@ const ENV_CONFIG = {
 };
 
 // 导出当前环境的配置
-export const config = ENV_CONFIG[CURRENT_ENV as EnvType];
+export const config = ENV_CONFIG[CURRENT_ENV === 'development' ? EnvType.DEV : EnvType.PROD];
 
 // 导出判断当前环境的辅助函数
-export const isDev = () => CURRENT_ENV === EnvType.DEV;
-export const isProd = () => CURRENT_ENV === EnvType.PROD as unknown as string; 
+export const isDev = () => CURRENT_ENV === 'development';
+export const isProd = () => CURRENT_ENV === 'production'; 
