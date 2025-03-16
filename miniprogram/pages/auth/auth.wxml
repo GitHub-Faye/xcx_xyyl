@@ -18,11 +18,6 @@
       <button wx:if="{{isOptionalLogin}}" class="btn skip-btn" bindtap="skipLogin">
         暂不登录，继续使用
       </button>
-      
-      <view class="privacy-policy">
-        登录即表示您同意
-        <text class="link" bindtap="showPrivacyPolicy">《用户协议与隐私政策》</text>
-      </view>
     </view>
     
     <view class="app-features" wx:if="{{showFeatures}}">
@@ -33,10 +28,6 @@
       <view class="feature-item">
         <image class="feature-icon" src="/images/feature-analysis.png" mode="aspectFit"></image>
         <text class="feature-text">趋势分析</text>
-      </view>
-      <view class="feature-item">
-        <image class="feature-icon" src="/images/feature-reminder.png" mode="aspectFit"></image>
-        <text class="feature-text">健康提醒</text>
       </view>
     </view>
   </view>
